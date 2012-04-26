@@ -49,7 +49,7 @@ openmultimedia.componentes.video.JwPlugin.prototype.config_ = {
   'liveOptions': {
     'position': 'controlbar',
     'startup': false,
-    'thumbnail': openmultimedia.resources.video.LIVE_THUMBNAIL_PATH
+    'thumbnail': ''
   }
 };
 

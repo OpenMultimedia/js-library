@@ -124,7 +124,7 @@ openmultimedia.componentes.mapas.ClipInfoWindow.prototype.playerOptions_ = {
     'config': {
       'live':true,
       'liveOptions': {
-        'position': 'dock' //TODO (arv): Configurar desde una Enumeración
+        'position': 'dock' //TODO (arv): Configurar desde una Enumeración,
       }
     }
   }
