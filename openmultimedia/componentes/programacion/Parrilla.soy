@@ -1,0 +1,119 @@
+{namespace openmultimedia.componentes.programacion.ParrillaTemplates}
+
+/**
+ * Contenedor General
+ * @param localizacion Mapa de caadenas de localización que se usarán
+ * @param dias Arreglo que indica el orden en el que se colocarán los dias de la semana
+ */
+{template .contenedor}
+<div class="{css openmultimedia-componentes-parrilla-contenedor}">
+  {call .tablaSemana data="all" /}
+  {call .tablaProgramacionEncabezados data="all" /}
+    // .tabla
+  <div class="{css openmultimedia-componentes-parrilla-programacion-contenedor}"></div>
+</div>
+{/template}
+
+/**
+ * Tabla que muestra los dias de la semana
+ * @param localizacion Mapa de caadenas de localización que se usarán
+ * @param dias Arreglo que indica el orden en el que se colocarán los dias de la semana
+ */
+{template .tablaSemana private="true"}
+<table class="{css openmultimedia-componentes-parrilla-semana}">
+  <tr class="{css openmultimedia-componentes-parrilla-semana-fila}">
+    {foreach $dia in $dias}
+      {if isFirst($dia)}
+        <td class="{css openmultimedia-componentes-parrilla-semana-separador-inicial}"></td>
+      {/if}
+
+      {if not isFirst($dia)}
+        <td class="{css openmultimedia-componentes-parrilla-semana-separador}"></td>
+      {/if}
+
+      <td class="{css openmultimedia-componentes-parrilla-semana-dia}">{$localizacion['dias'][$dia]}</td>
+
+      {if isLast($dia)}
+        <td class="{css openmultimedia-componentes-parrilla-semana-separador-final}"></td>
+      {/if}
+    {/foreach}
+  </tr>
+</table>
+{/template}
+
+/**
+ * Tabla que muestra la programación del dia
+ * @param localizacion Mapa de cadenas de localización que se usarán
+ */
+{template .tablaProgramacionEncabezados private="true"}
+<table class="{css openmultimedia-componentes-parrilla-programacion openmultimedia-componentes-parrilla-programacion-header}">
+  <thead class="{css openmultimedia-componentes-parrilla-header}">
+    <tr>
+      <td class="{css openmultimedia-componentes-parrilla-item-separador-inicial}"></td>
+      <td class="{css openmultimedia-componentes-parrilla-item-horario}">{$localizacion['encabezados']['horario']}</td>
+      <td class="{css openmultimedia-componentes-parrilla-item-separador}"></td>
+      <td class="{css openmultimedia-componentes-parrilla-item-programa}">{$localizacion['encabezados']['programa']}</td>
+      <td class="{css openmultimedia-componentes-parrilla-item-separador}"></td>
+      <td class="{css openmultimedia-componentes-parrilla-item-descripcion}">{$localizacion['encabezados']['descripcion']}</td>
+      <td class="{css openmultimedia-componentes-parrilla-item-separador-final}"></td>
+    </tr>
+  </thead>
+</table>
+{/template}
+
+/**
+ * Tabla que muestra la programación del dia
+ * @param pais  País principal
+ * @param regiones Las diferentes regiones que se mostrarán
+ * @param programacion Programación para el día seleccionado
+ * @param localizacion Mapa de cadenas de localización que se usarán
+ * @param mostrarHoraFinal Opción que indica que horas finales se mostraran
+ */
+{template .tablaProgramacion}
+<div class="{css openmultimedia-componentes-parrilla-programacion-contenedor}">
+  <table class="{css openmultimedia-componentes-parrilla-programacion} {css openmultimedia-componentes-parrilla-programacion-contenido}">
+    <tbody class="{css openmultimedia-componentes-parrilla-body}">
+      {foreach $dataUnit in $programacion}
+        <tr class="{css openmultimedia-componentes-parrilla-tabla-fila} {if index($dataUnit) % 2 == 0}{css openmultimedia-componentes-parrilla-tabla-fila-par}{else}{css openmultimedia-componentes-parrilla-tabla-fila-non}{/if} {switch $dataUnit.emision.estado}{case 'en-vivo'}{css openmultimedia-componentes-parrilla-item-en-vivo}{case 'grabado'}{css openmultimedia-componentes-parrilla-item-grabado}{case 'programado'}{css openmultimedia-componentes-parrilla-item-programado}{/switch}">
+          <td class="{css openmultimedia-componentes-parrilla-item-separador-inicial}"></td>
+          <td class="{css openmultimedia-componentes-parrilla-item-horario}">
+            {if $dataUnit.emision.estado == 'en-vivo' } // or $dataUnit.emision.estado == 'grabado'} // or $dataUnit.emision.estado == 'programado'}
+            <div class="{css openmultimedia-componentes-parrilla-item-estado-transmision}">
+              <a class="openmultimedia-componentes-parrilla-item-estado-transmision-link" href="{$dataUnit.emision.url ? $dataUnit.emision.url : ''}" target="_parent">
+                {$localizacion['estado-transmision'][$dataUnit.emision.estado]}
+              </a>
+            </div>
+            {/if}
+            <span class="{css openmultimedia-componentes-parrilla-item-horario-principal}">
+              <span class="{css openmultimedia-componentes-parrilla-item-horario-pais}">{$localizacion['regiones'][$pais]['nombre']}</span>
+              <span class="{css openmultimedia-componentes-parrilla-item-horario-hora}">{$dataUnit.hora[$pais].inicio}{if $mostrarHoraFinal != 'ninguno'} - {$dataUnit.hora[$pais].fin}{/if}</span>
+            </span>
+
+            {foreach $region in $regiones}
+                <span class="{css openmultimedia-componentes-parrilla-item-horario-otro} {if index($region) % 2 == 0} {css openmultimedia-componentes-parrilla-item-horario-otro-par} {else} {css openmultimedia-componentes-parrilla-item-horario-otro-non} {/if}">
+                  <span class="{css openmultimedia-componentes-parrilla-item-horario-pais}">[{$localizacion['regiones'][$region]['abreviatura']}]</span>{sp}
+                  <span class="{css openmultimedia-componentes-parrilla-item-horario-hora}">{$dataUnit.hora[$region].inicio}{if $mostrarHoraFinal == 'todos'} - {$dataUnit.hora[$region].fin}{/if}</span>
+                </span>
+            {/foreach}
+          </td>
+          <td class="{css openmultimedia-componentes-parrilla-item-separador}"></td>
+          <td class="{css openmultimedia-componentes-parrilla-item-programa}">
+            {if $dataUnit.programa.imagen_url}
+            <p>{$dataUnit.programa.nombre}</p>
+            <img class="{css openmultimedia-componentes-parrilla-item-programa-logo}" src="{$dataUnit.programa.imagen_url}" alt="{$dataUnit.programa.nombre}"/>
+            {else}
+            // CHECK: Workaround para tratar con los nombres de programas obtenidos del API de programación, que contienen entidades HTML
+            <p>{$dataUnit.programa.nombre |noAutoescape}</p>
+            {/if}
+          </td>
+          <td class="{css openmultimedia-componentes-parrilla-item-separador}"></td>
+          <td class="{css openmultimedia-componentes-parrilla-item-descripcion}">
+            {$dataUnit.programa.descripcion |truncate:240}
+          </td>
+          <td class="{css openmultimedia-componentes-parrilla-item-separador-final}"></td>
+        </tr>
+      {/foreach}
+    </tbody>
+  </table>
+</div>
+{/template}
