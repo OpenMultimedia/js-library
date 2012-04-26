@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 closure_stylesheets () {
 pwd
