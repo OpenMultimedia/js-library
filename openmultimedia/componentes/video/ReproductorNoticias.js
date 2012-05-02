@@ -35,6 +35,7 @@ openmultimedia.componentes.video.ReproductorNoticias = function(medio, options, 
 
   goog.DEBUG && console.groupEnd();
 };
+
 goog.inherits(openmultimedia.componentes.video.ReproductorNoticias, goog.ui.Component);
 
 openmultimedia.componentes.video.ReproductorNoticias.prototype.setOptions = function(options) {
@@ -88,6 +89,12 @@ openmultimedia.componentes.video.ReproductorNoticias.prototype.setMultimediaPlug
 openmultimedia.componentes.video.ReproductorNoticias.prototype.medio_ = null;
 
 openmultimedia.componentes.video.ReproductorNoticias.prototype.containerNode_ = null;
+
+openmultimedia.componentes.video.ReproductorNoticias.prototype.pendingClipList_ = null;
+
+openmultimedia.componentes.video.ReproductorNoticias.prototype.pendingVideoList_ = null;
+
+openmultimedia.componentes.video.ReproductorNoticias.prototype.pendingAutoplay_ = null;
 
 openmultimedia.componentes.video.ReproductorNoticias.prototype.options_ = {
   'multimediaPlugin': true,
@@ -165,8 +172,13 @@ openmultimedia.componentes.video.ReproductorNoticias.prototype.getJwOptions_ = f
   if (this.element_) {
     var divSize = goog.style.getSize(this.element_);
 
-    jwOptions['width'] = divSize.width;
-    jwOptions['height'] = divSize.height;
+    if ( ! ('width' in jwOptions) ) {
+      jwOptions['width'] = divSize.width;
+    }
+
+    if ( ! ('height' in jwOptions) ) {
+      jwOptions['height'] = divSize.height;
+    }
   }
 
   var internalPlugins = {};
@@ -182,66 +194,137 @@ openmultimedia.componentes.video.ReproductorNoticias.prototype.getJwOptions_ = f
   return jwOptions;
 };
 
-openmultimedia.componentes.video.ReproductorNoticias.prototype.setCurrentVideo_ = function(video) {
-  this.currentVideo_ = video;
+openmultimedia.componentes.video.ReproductorNoticias.prototype.setPendingClipList_ = function(clipData) {
+  this.pendingClipList_ = clipData;
 };
 
-openmultimedia.componentes.video.ReproductorNoticias.prototype.getCurrentVideo_ = function() {
-  return this.currentVideo_;
+openmultimedia.componentes.video.ReproductorNoticias.prototype.getPendingClipList_ = function() {
+  return this.pendingClipList_;
 };
 
-openmultimedia.componentes.video.ReproductorNoticias.prototype.setCurrentAutoplay_ = function(autoplay) {
-  this.currentAutoplay_ = autoplay;
+openmultimedia.componentes.video.ReproductorNoticias.prototype.setPendingVideoList_ = function(videoList) {
+  this.pendingVideoList_ = videoList;
 };
 
-openmultimedia.componentes.video.ReproductorNoticias.prototype.getCurrentAutoplay_ = function() {
-  return this.currentAutoplay_;
+openmultimedia.componentes.video.ReproductorNoticias.prototype.getPendingVideoList_ = function() {
+  return this.pendingVideoList_;
 };
 
+openmultimedia.componentes.video.ReproductorNoticias.prototype.setPendingAutoplay_ = function(autoplay) {
+  this.pendingAutoplay_ = autoplay;
+};
+
+openmultimedia.componentes.video.ReproductorNoticias.prototype.getPendingAutoplay_ = function() {
+  return this.pendingAutoplay_;
+};
+
+openmultimedia.componentes.video.ReproductorNoticias.prototype.clearPending_ = function() {
+  this.pendingAutoplay_ = false;
+  this.pendingVideoList_ = null;
+  this.pendingClipList_ = null;
+}
+
+/** @deprecated Utilizar {@code playClipList} en su lugar*/
 openmultimedia.componentes.video.ReproductorNoticias.prototype.playClip = function(clipData, autoplay) {
-  var video = {
-    'image': clipData['thumbnail_mediano']
-  };
+  this.playClipList([clipData], autoplay);
+};
 
-  if (clipData['metodo_preferido'] == openmultimedia.api.MetodoTransmision.Streaming) {
-    video.streamer = clipData['streaming']['rtmp_server'];
-    video.file = clipData['streaming']['rtmp_file'];
-  } else {
-    video.file = clipData['archivo_url'];
-  }
+openmultimedia.componentes.video.ReproductorNoticias.prototype.playClipList = function(clipData, autoplay) {
+  this.clearPending_();
 
   if (this.player_) {
-    // Se detiene el video actual y se carga el nuevo
-    this.player_.stop();
-    this.player_.load(video);
+    var renderingMode = this.player_.getRenderingMode();
+
+    if ( renderingMode ) {
+      // Se detiene el video actual y se carga el nuevo
+      this.player_.stop();
+
+      var videoList = openmultimedia.componentes.video.ReproductorNoticias.makePlaylist( clipData, renderingMode );
+
+      this.player_.load(videoList);
+
+      // Se conoce el Modo de Rendering actual, se guarda la lista de reproducción procesada en caso de que el player este en modo de espera
+    this.setPendingVideoList_(videoList);
+    }
   }
 
-  //Se pone el clip en la cola de reproducción.
-  //La cola entra en funcionamiento si el reproductor se "desactivó" o esta en activación
-  this.setCurrentVideo_(video);
-  this.setCurrentAutoplay_(autoplay);
+  // El reproductor no ha sido inicializado. Se guarda la lista de clips completa.
+  this.setPendingClipList_(clipData);
+
+  this.setPendingAutoplay_(autoplay);
 };
 
 /** @this {jwplayer.Player} */
 openmultimedia.componentes.video.ReproductorNoticias.onJwplayerReady_ = function(multimediaPlayer, event) {
   goog.DEBUG && console.log('External Ready');
 
-  var queuedVideo = multimediaPlayer.getCurrentVideo_();
+  var pendingVideoList = multimediaPlayer.getPendingVideoList_();
 
-  if (queuedVideo) {
-    goog.DEBUG && console.log('External Queue Process');
+  if ( ! pendingVideoList ) {
+    var pendingClipList = multimediaPlayer.getPendingClipList_();
+
+    if ( pendingClipList ) {
+      pendingVideoList = openmultimedia.componentes.video.ReproductorNoticias.makePlaylist(pendingClipList, this.getRenderingMode());
+    }
+  }
+
+  if (pendingVideoList) {
+    goog.DEBUG && console.log('External Queue Process', pendingVideoList);
     this.stop();
-    this.load(queuedVideo);
-    multimediaPlayer.setCurrentVideo_(null);
+    this.load(pendingVideoList);
+    multimediaPlayer.setPendingVideoList_(null);
+    multimediaPlayer.setPendingClipList_(null);
   }
 };
 
 /** @this {jwplayer.Player} */
 openmultimedia.componentes.video.ReproductorNoticias.onJwplayerPlaylist_ = function(multimediaPlayer, event) {
-  var autoplay = multimediaPlayer.getCurrentAutoplay_();
+  var autoplay = multimediaPlayer.getPendingAutoplay_();
 
   if (autoplay) {
     this.play(true);
-    multimediaPlayer.setCurrentAutoplay_(false);
+    multimediaPlayer.setPendingAutoplay_(false);
   }
+};
+
+openmultimedia.componentes.video.ReproductorNoticias.makePlaylist = function (clipList, renderingMode) {
+  goog.DEBUG && console.log('Convirtiendo a Playlist', clipList);
+
+  if ( goog.typeOf(clipList) == 'object' ) {
+    clipList = [ clipList ];
+  }
+
+  var streamingSupport = false;
+  streamingSupport = (renderingMode == openmultimedia.externals.jwplayer.RenderingMode.Flash);
+
+  var videoList =[];
+
+  var currentClip;
+
+  var video;
+
+  for ( var i = 0; i < clipList.length; i += 1 ) {
+    currentClip = clipList[i];
+
+    video = {
+        'title': currentClip['titulo'],
+        'description': currentClip['descripcion'],
+        'duration': currentClip['duracion'],
+        'image': currentClip['thumbnail_mediano'],
+        'playlist.image': currentClip['thumbnail_pequeno']
+    };
+
+    if ( streamingSupport && ( currentClip['metodo_preferido'] == openmultimedia.api.MetodoTransmision.Streaming ) ) {
+      video['streamer'] = currentClip['streaming']['rtmp_server'];
+      video['file'] = currentClip['streaming']['rtmp_file'];
+    } else {
+      video['file'] = currentClip['archivo_url'];
+    }
+
+    videoList[i] = video;
+  }
+
+  goog.DEBUG && console.log('Playlist', videoList);
+
+  return videoList;
 };
