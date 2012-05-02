@@ -4,22 +4,42 @@ closure_stylesheets () {
 pwd
 
     input=''
+	output=''
+	allow_prop=''
+	allow_func=''
 
     while [ $1 ]
     do
-        if [ "$1" == "-out" ]
-        then
-            shift
-            output="$1"
-        else
-            input="$input $1"
-        fi
+        case "$1"  in
+			"-out")
+				shift
+				output="$1"
+				;;
+
+			"-in")
+				shift
+				input="$input $1"
+				;;
+
+			"-allow-func")
+				shift
+				allow_function="$allow_function --allowed-non-standard-function $1"
+				;;
+
+			"-allow-prop")
+				allow_function="$allow_prop --allowed-unrecognized-property $1"
+				;;
+
+		esac
+
         shift
     done
 
-    java -jar "$CLOSURE_STYLESHEETS_PATH" \
+    java -jar "${CLOSURE_STYLESHEETS_PATH}" \
+	$allow_prop \
+	$allow_func \
     $input \
-    > $output
+    > "$output"
 }
 
 closure_build () {
@@ -73,7 +93,6 @@ closure_build () {
         --compiler_jar="$CLOSURE_COMPILER_PATH" \
         --compiler_flags="--summary_detail_level=3" \
         --compiler_flags="--warning_level=VERBOSE" \
-        --compiler_flags="--jscomp_error=deprecated" \
         --compiler_flags="--compilation_level=ADVANCED_OPTIMIZATIONS" \
         --compiler_flags="--process_closure_primitives" \
         --compiler_flags="--formatting=PRETTY_PRINT" \
@@ -99,7 +118,6 @@ closure_build () {
         --compiler_jar="$CLOSURE_COMPILER_PATH" \
         --compiler_flags="--summary_detail_level=3" \
         --compiler_flags="--warning_level=VERBOSE" \
-        --compiler_flags="--jscomp_error=deprecated" \
         --compiler_flags="--compilation_level=ADVANCED_OPTIMIZATIONS" \
         --compiler_flags="--process_closure_primitives" \
         --compiler_flags="--define=goog.DEBUG=false" \
