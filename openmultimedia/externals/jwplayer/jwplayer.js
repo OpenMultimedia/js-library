@@ -40,6 +40,20 @@ openmultimedia.externals.jwplayer.getWrapperId = function(playerId) {
  * Valores posibles para el modo de funcionamiento del reproductor
  * @enum {string}
  */
+openmultimedia.externals.jwplayer.RenderingMode = {
+  /** El reproductor está funcionando en modo html5 */
+  Html5: 'html5',
+  /** El reproductor esta funcionando en modo flash */
+  Flash: 'flash',
+  /** El reproductor está funcionando en modo download */
+  Download: 'download'
+}
+
+/**
+ * Valores posibles para el modo de funcionamiento del reproductor
+ * @enum {string}
+ * @deprecated Usar {@code openmultimedia.externals.jwplayer.RenderingMode} en su lugar
+ */
 openmultimedia.externals.jwplayer.Mode = {
   /** El reproductor está funcionando en modo html5 */
   HTML5: 'html5',
@@ -47,7 +61,7 @@ openmultimedia.externals.jwplayer.Mode = {
   FLASH: 'flash',
   /** El reproductor está funcionando en modo download */
   DOWNLOAD: 'download'
-}
+};
 
 /**
  * Posiciones posibles de un Plugin

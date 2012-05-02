@@ -78,8 +78,17 @@ openmultimedia.api.ManejadorApi.prototype.setConcurrentRequestModel = function (
   this.concurrentRequestModel_ = model;
 };
 
+/** @deprecated Use loadClipList instead */
 openmultimedia.api.ManejadorApi.prototype.loadClips = function(queryOptions, successCallback, opt_errorCallback) {
   return this.makeRequest('clip/', queryOptions, successCallback, opt_errorCallback);
+}
+
+openmultimedia.api.ManejadorApi.prototype.loadClipList = function(queryOptions, successCallback, opt_errorCallback) {
+  return this.makeRequest('clip/', queryOptions, successCallback, opt_errorCallback);
+}
+
+openmultimedia.api.ManejadorApi.prototype.loadClip = function(slug, successCallback, opt_errorCallback) {
+  return this.makeRequest('clip/' + slug + '/', {}, successCallback, opt_errorCallback);
 }
 
 /**
