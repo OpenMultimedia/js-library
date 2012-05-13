@@ -21,13 +21,13 @@ openmultimedia.externals.google.maps.requireLib();
  * Constructor para un Mapa de Corresponsales.
  * @constructor
  * @abstract
+ * @extends {goog.ui.Component}
  */
-openmultimedia.componentes.mapas.MapaCorresponsales = function(nodo, medio, opt_opciones) {
+openmultimedia.componentes.mapas.MapaCorresponsales = function(medio, opt_opciones, opt_domHelper) {
   goog.DEBUG && console.groupCollapsed('openmultimedia.componentes.mapas.MapaCorresponsales.constructor');
 
-  goog.DEBUG && console.log('Construyendo Mapa Multimedia en: ', nodo);
+  goog.DEBUG && console.log('Construyendo Mapa Multimedia en: ');
 
-  this.nodo_ = nodo;
   this.medio_ = medio;
 
   this.setOptions(opt_opciones);
@@ -35,16 +35,12 @@ openmultimedia.componentes.mapas.MapaCorresponsales = function(nodo, medio, opt_
   goog.DEBUG && console.log('Creando el Manejador del API');
   this.manejadorApi_ = new openmultimedia.api.ManejadorApi(this.medio_, this.options_['lang']);
 
-  this.render();
-
   goog.DEBUG && console.groupEnd();
+
+  goog.base(this, opt_domHelper);
 }
 
-/**
- * Nodo contenedor del Mapa
- * @type {Node}
- */
-openmultimedia.componentes.mapas.MapaCorresponsales.prototype.nodo_ = null;
+goog.inherits(openmultimedia.componentes.mapas.MapaCorresponsales, goog.ui.Component);
 
 /**
  * Medio sobre el que se creará el Mapa
@@ -293,105 +289,6 @@ openmultimedia.componentes.mapas.MapaCorresponsales.prototype.setLocalization = 
   goog.DEBUG && console.groupEnd();
 };
 
-openmultimedia.componentes.mapas.MapaCorresponsales.prototype.render = function() {
-  goog.DEBUG && console.groupCollapsed('openmultimedia.componentes.mapas.MapaCorresponsales');
-
-  goog.dom.classes.add(this.nodo_, goog.getCssName('openmultimedia-componentes-mapa-contenedor'));
-
-  goog.DEBUG && console.log('Creando el InfoWindow');
-
-  this.clipInfoWindow_ = new openmultimedia.componentes.mapas.ClipInfoWindow(this.medio_, this.infowindowOptions_);
-
-  goog.DEBUG && console.log("Construyengo Google Map en ", this.nodo_, "con las opciones", this.mapOptions_);
-
-  // Creamos el mapa vacío
-  this.map_ = new google.maps.Map(this.nodo_, this.mapOptions_);
-
-  var mapTypeList = [], mapType, tileSize, region, tileUrlTemplate;
-
-  goog.DEBUG && console.log(this.regionesOptions_);
-
-  var globalTileSize = openmultimedia.externals.google.maps.makeSize(this.regionesOptions_.global.tileSize);
-
-  var lang = this.options_['lang'];
-
-  for (var i = 0; i < this.regionesOptions_.regiones.length; i += 1) {
-    region = this.regionesOptions_.regiones[i];
-
-    tileSize = region.tileSize ? openmultimedia.externals.google.maps.makeSize(region.tileSize) : globalTileSize;
-    tileUrlTemplate = region.tileUrlTemplate ? region.tileUrlTemplate : this.regionesOptions_.global.tileUrlTemplate;
-
-    mapType = {
-      'name': this.regionesOptions_.localization[lang][ region.slug ].nombre,
-      'getTileUrl': goog.bind(this.getTileUrl_, this,  region.slug, tileUrlTemplate),
-      'tileSize': tileSize,
-      'maxZoom': ( region.zoom && region.zoom.max ) ? region.zoom.max : this.regionesOptions_.global.defaultZoom.max,
-      'minZoom': ( region.zoom && region.zoom.min ) ? region.zoom.min : this.regionesOptions_.global.defaultZoom.min
-    };
-
-    this.map_.mapTypes.set(region.slug, new google.maps.ImageMapType( mapType ) );
-    mapTypeList[i] = region.slug;
-  }
-
-  // Se calculan las opciones para el control de tipo de mapas
-  var mapOptions = goog.object.clone(this.mapOptions_);
-
-  if ( typeof mapOptions['mapTypeControlOptions'] == 'object' ) {
-    mapOptions['mapTypeControlOptions'] = goog.object.clone( mapOptions['mapTypeControlOptions'] );
-  } else {
-    mapOptions['mapTypeControlOptions'] = {};
-  }
-
-  mapOptions['mapTypeControlOptions']['mapTypeIds'] = mapTypeList;
-
-  var regionDefault = this.options_['regionDefault'];
-  var regionId;
-
-  if ( ( ! regionDefault ) || ( ! regionDefault in this.regionesMap_ ) ) {
-    regionDefault = mapTypeList[0];
-  }
-
-  mapOptions['mapTypeId'] = regionDefault;
-
-  var regionInicial = this.regionesMap_[regionDefault];
-
-  mapOptions['center'] = openmultimedia.externals.google.maps.makeLatLng(regionInicial.center ? regionInicial.center : this.regionesOptions_.global.defaultCenter);
-
-  /**
-   * Procesa
-   * @param {openmultimedia.componentes.mapas.MapaCorresponsales} mapaMultimedia
-   * @this {google.maps.Map}
-   */
-  var onMapTypeIdChanged = function(mapaMultimedia) {
-    var newMapType = this.getMapTypeId();
-
-    var region = mapaMultimedia.getRegion(newMapType);
-
-    if ( region && region.center) {
-      var coords = openmultimedia.externals.google.maps.makeLatLng(region.center);
-      this.panTo( coords );
-    }
-
-    mapaMultimedia.reload();
-  };
-
-  google.maps.event.addListener(this.map_, "maptypeid_changed", goog.partial(onMapTypeIdChanged, this));
-
-  goog.DEBUG && console.log('Final opts', mapOptions);
-
-  this.selector_ = new openmultimedia.componentes.mapas.ButtonListFilter(this, this.selectorOptions_);
-
-  if ( ! this.options_['selector'] ) {
-    goog.style.showElement(this.selector_.node_, false);
-  }
-
-  goog.events.listen(this.selector_, openmultimedia.componentes.mapas.ButtonListFilter.EventType.CHANGE, goog.bind(this.reload, this));
-
-  this.map_.setOptions(mapOptions);
-
-  goog.DEBUG && console.groupEnd();
-}
-
 openmultimedia.componentes.mapas.MapaCorresponsales.prototype.toggleInfoWindow_ = function (marker, dataList) {
   this.clipInfoWindow_.close();
 
@@ -526,6 +423,111 @@ openmultimedia.componentes.mapas.MapaCorresponsales.prototype.getRegion = functi
 
   return null;
 }
+
+openmultimedia.componentes.mapas.MapaCorresponsales.prototype.createDom = function () {
+  this.element_ = goog.dom.createDom('div', {style: 'width: 100%; height: 100%;'});
+};
+
+openmultimedia.componentes.mapas.MapaCorresponsales.prototype.enterDocument = function () {
+  goog.DEBUG && console.groupCollapsed('openmultimedia.componentes.mapas.MapaCorresponsales.enterDocument');
+
+  goog.dom.classes.add(this.element_, goog.getCssName('openmultimedia-componentes-mapa-contenedor'));
+
+  goog.DEBUG && console.log('Creando el InfoWindow');
+
+  this.clipInfoWindow_ = new openmultimedia.componentes.mapas.ClipInfoWindow(this.element_, this.infowindowOptions_);
+
+  goog.DEBUG && console.log("Construyengo Google Map en ", this.element_, "con las opciones", this.mapOptions_);
+
+  // Creamos el mapa vacío
+  this.map_ = new google.maps.Map(this.element_, this.mapOptions_);
+
+  var mapTypeList = [], mapType, tileSize, region, tileUrlTemplate;
+
+  goog.DEBUG && console.log(this.regionesOptions_);
+
+  var globalTileSize = openmultimedia.externals.google.maps.makeSize(this.regionesOptions_.global.tileSize);
+
+  var lang = this.options_['lang'];
+
+  for (var i = 0; i < this.regionesOptions_.regiones.length; i += 1) {
+    region = this.regionesOptions_.regiones[i];
+
+    tileSize = region.tileSize ? openmultimedia.externals.google.maps.makeSize(region.tileSize) : globalTileSize;
+    tileUrlTemplate = region.tileUrlTemplate ? region.tileUrlTemplate : this.regionesOptions_.global.tileUrlTemplate;
+
+    mapType = {
+      'name': this.regionesOptions_.localization[lang][ region.slug ].nombre,
+      'getTileUrl': goog.bind(this.getTileUrl_, this,  region.slug, tileUrlTemplate),
+      'tileSize': tileSize,
+      'maxZoom': ( region.zoom && region.zoom.max ) ? region.zoom.max : this.regionesOptions_.global.defaultZoom.max,
+      'minZoom': ( region.zoom && region.zoom.min ) ? region.zoom.min : this.regionesOptions_.global.defaultZoom.min
+    };
+
+    this.map_.mapTypes.set(region.slug, new google.maps.ImageMapType( mapType ) );
+    mapTypeList[i] = region.slug;
+  }
+
+  // Se calculan las opciones para el control de tipo de mapas
+  var mapOptions = goog.object.clone(this.mapOptions_);
+
+  if ( typeof mapOptions['mapTypeControlOptions'] == 'object' ) {
+    mapOptions['mapTypeControlOptions'] = goog.object.clone( mapOptions['mapTypeControlOptions'] );
+  } else {
+    mapOptions['mapTypeControlOptions'] = {};
+  }
+
+  mapOptions['mapTypeControlOptions']['mapTypeIds'] = mapTypeList;
+
+  var regionDefault = this.options_['regionDefault'];
+  var regionId;
+
+  if ( ( ! regionDefault ) || ( ! regionDefault in this.regionesMap_ ) ) {
+    regionDefault = mapTypeList[0];
+  }
+
+  mapOptions['mapTypeId'] = regionDefault;
+
+  var regionInicial = this.regionesMap_[regionDefault];
+
+  mapOptions['center'] = openmultimedia.externals.google.maps.makeLatLng(regionInicial.center ? regionInicial.center : this.regionesOptions_.global.defaultCenter);
+
+  /**
+   * Procesa
+   * @param {openmultimedia.componentes.mapas.MapaCorresponsales} mapaMultimedia
+   * @this {google.maps.Map}
+   */
+  var onMapTypeIdChanged = function(mapaMultimedia) {
+    var newMapType = this.getMapTypeId();
+
+    var region = mapaMultimedia.getRegion(newMapType);
+
+    if ( region && region.center) {
+      var coords = openmultimedia.externals.google.maps.makeLatLng(region.center);
+      this.panTo( coords );
+    }
+
+    mapaMultimedia.reload();
+  };
+
+  google.maps.event.addListener(this.map_, "maptypeid_changed", goog.partial(onMapTypeIdChanged, this));
+
+  goog.DEBUG && console.log('Final opts', mapOptions);
+
+  this.selector_ = new openmultimedia.componentes.mapas.ButtonListFilter(this, this.selectorOptions_);
+
+  if ( ! this.options_['selector'] ) {
+    goog.style.showElement(this.selector_.element_, false);
+  }
+
+  goog.events.listen(this.selector_, openmultimedia.componentes.mapas.ButtonListFilter.EventType.CHANGE, goog.bind(this.reload, this));
+
+  this.map_.setOptions(mapOptions);
+
+  goog.DEBUG && console.groupEnd();
+
+  goog.base(this, 'enterDocument');
+};
 
 openmultimedia.componentes.mapas.MapaCorresponsales.getNormalizedCoord_ = function(coord, zoom) {
   var y = coord.y, x = coord.x, tileRange;
