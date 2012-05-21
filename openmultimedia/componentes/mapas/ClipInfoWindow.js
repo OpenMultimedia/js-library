@@ -26,6 +26,7 @@ openmultimedia.componentes.mapas.ClipInfoWindow = function (medio, opt_options) 
   switch ( this.options_['type'] ) {
     case WindowTypeEnum.InfoWindow:
       this.infoWindow_ = new google.maps.InfoWindow();
+
       break;
     case WindowTypeEnum.Overlay:
     default:
@@ -51,6 +52,7 @@ openmultimedia.componentes.mapas.ClipInfoWindow = function (medio, opt_options) 
   this.spanCorresponsalNombre = goog.dom.getElementByClass(goog.getCssName('openmultimedia-infowindow-info-item-corresponsal-nombre'), this.nodo_);
 
   this.divCorresponsalTwitter = goog.dom.getElementByClass(goog.getCssName('openmultimedia-infowindow-info-item-corresponsal-twitter'), this.nodo_);
+  this.divCorresponsalTwitterAvatar = goog.dom.getElementByClass(goog.getCssName('openmultimedia-infowindow-info-item-corresponsal-twitter-avatar'), this.divCorresponsalTwitter);
   this.spanCorresponsalTwitterScreenname =
   goog.dom.getElementByClass(goog.getCssName('openmultimedia-infowindow-info-item-corresponsal-twitter-screenname'), this.divCorresponsalTwitter);
 
@@ -82,6 +84,14 @@ openmultimedia.componentes.mapas.ClipInfoWindow = function (medio, opt_options) 
     goog.style.showElement(this.imgThumbnail, false);
     goog.style.showElement(this.divPlayer, true);
     this.player_ = new openmultimedia.componentes.video.ReproductorNoticias(this.medio_, this.playerOptions_);
+
+    /*
+    if ( this.options_['type'] == WindowTypeEnum.InfoWindow ) {
+      google.maps.addEventListener( this.infoWindow_, 'closeclick', goog.bind(this.onInfoWindowClosed_, this) );
+    } else {
+      goog.events.listen(this.infoWindow_, 'closeclick', goog.bind(this.onInfoWindowClosed_, this) );
+    }
+    */
   }
 }
 
@@ -213,7 +223,7 @@ openmultimedia.componentes.mapas.ClipInfoWindow.prototype.open = function ( mark
 
 openmultimedia.componentes.mapas.ClipInfoWindow.prototype.close = function () {
   this.currentMarker_ = null;
- this.infoWindow_.close();
+  this.infoWindow_.close();
 }
 
 openmultimedia.componentes.mapas.ClipInfoWindow.prototype.setDataList = function (dataList) {
@@ -309,7 +319,7 @@ openmultimedia.componentes.mapas.ClipInfoWindow.prototype.onCargarUltimoTweet_ =
     return;
   }
 
-  this.divCorresponsalTwitter.style.backgroundImage = 'url(' + tweet['user']['profile_image_url'] + ')';
+  this.divCorresponsalTwitterAvatar.style.backgroundImage = 'url(' + tweet['user']['profile_image_url'] + ')';
   goog.dom.setTextContent(this.spanCorresponsalTwitterScreenname, '@' + this.twitterUser_ );
   goog.dom.setTextContent(this.spanCorresponsalTwitterTweet, tweetList[0].text );
 
@@ -342,3 +352,13 @@ openmultimedia.componentes.mapas.ClipInfoWindow.prototype.onClickPrev_ = functio
 
   this.setCurrentIndex( newIndex );
 };
+
+/*
+openmultimedia.componentes.mapas.ClipInfoWindow.prototype.onInfoWindowClosed_ = function () {
+  goog.DEBUG  && console.log('IW Closed');
+  if ( this.player_ ) {
+    goog.DEBUG && console.log('Disposing Player');
+    this.player_.exitDocument();
+  }
+}
+*/

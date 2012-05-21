@@ -4,6 +4,7 @@ goog.require('openmultimedia.componentes.mapas.SkinnableInfoWindowTemplates');
 goog.require('goog.dom');
 goog.require('goog.style');
 goog.require('goog.events');
+goog.require('goog.events.EventTarget');
 
 /** @constructor */
 openmultimedia.componentes.mapas.SkinnableInfoWindow = function () {
@@ -12,8 +13,10 @@ openmultimedia.componentes.mapas.SkinnableInfoWindow = function () {
    this.contentNode_ = goog.dom.getElementByClass(goog.getCssName('openmultimedia-infowindow-window-content'), this.node_);
    this.closeButtonNode_ = goog.dom.getElementByClass(goog.getCssName('openmultimedia-infowindow-window-close-button'), this.node_);
 
-   goog.events.listen(this.closeButtonNode_, 'click', goog.bind( function() { this.close(); }, this ));
+   goog.events.listen(this.closeButtonNode_, 'click', goog.bind( this.onCloseClick_, this ));
 }
+
+goog.inherits(openmultimedia.componentes.mapas.SkinnableInfoWindow, goog.events.EventTarget);
 
 /**
  * Description
@@ -87,3 +90,9 @@ openmultimedia.componentes.mapas.SkinnableInfoWindow.prototype.adjustSize_ = fun
       goog.style.setPosition( this.windowNode_, (tmpContainerSize.width - tmpContentSize.width) / 2, (tmpContainerSize.height - tmpContentSize.height) / 2 );
    }
 }
+
+openmultimedia.componentes.mapas.SkinnableInfoWindow.prototype.onCloseClick_ = function() {
+   goog.DEBUG && console.log('Dispatching CloseClick');
+   this.dispatchEvent(new goog.events.Event('closeclick', this));
+   this.close();
+};
