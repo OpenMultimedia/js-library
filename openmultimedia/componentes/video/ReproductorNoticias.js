@@ -25,9 +25,7 @@ openmultimedia.componentes.video.ReproductorNoticias = function(medio, options, 
 
   this.medio_ = medio;
 
-  this.playerId_ = 'openmultimedia_jwplayer_' + goog.getUid(this);
-
-  this.playerWrapperId_ = this.playerId_ + '_outside_wrapper';
+  this.playerWrapperId_ = 'openmultimedia_jwplayer_outside_wrapper_' + goog.getUid(this);
 
   this.setOptions(options);
 
@@ -90,6 +88,8 @@ openmultimedia.componentes.video.ReproductorNoticias.prototype.medio_ = null;
 
 openmultimedia.componentes.video.ReproductorNoticias.prototype.containerNode_ = null;
 
+openmultimedia.componentes.video.ReproductorNoticias.prototype.playerReady_ = false;
+
 openmultimedia.componentes.video.ReproductorNoticias.prototype.pendingClipList_ = null;
 
 openmultimedia.componentes.video.ReproductorNoticias.prototype.pendingVideoList_ = null;
@@ -148,22 +148,54 @@ openmultimedia.componentes.video.ReproductorNoticias.prototype.playClip = functi
 
 /** @override */
 openmultimedia.componentes.video.ReproductorNoticias.prototype.createDom = function() {
-  this.playerElement_ = goog.dom.createDom('div', { 'id': this.playerId_ });
-  this.element_ = goog.dom.createDom('div', { 'id': this.playerWrapperId_, 'style': 'width: 100%; height: 100%;' }, this.playerElement_);
+    goog.DEBUG && console.log("DOM CREATE");
+
+    this.element_ = goog.dom.createDom('div', { 'id': this.playerWrapperId_, 'style': 'width: 100%; height: 100%;' });
+
+    this.playerId_ = 'openmultimedia_jwplayer_' + goog.getUid({});
+
+    this.playerElement_ = goog.dom.createDom('div', { 'id': this.playerId_ });
+
+    goog.dom.append(this.element_, this.playerElement_);
 };
 
 /** @override */
 openmultimedia.componentes.video.ReproductorNoticias.prototype.enterDocument = function() {
-  var jwOptions = this.getJwOptions_();
+    goog.DEBUG && console.log("ENTER DOCUMENT");
+    var jwOptions = this.getJwOptions_();
 
-  goog.DEBUG && console.log('Installing jwplayer in: ', this.playerElement_, 'with: ', jwOptions);
+    goog.DEBUG && console.log('Installing jwplayer in: ', this.playerId_, 'with: ', jwOptions);
 
-  this.player_ = jwplayer(this.playerElement_).setup(jwOptions);
+    this.player_ = jwplayer(this.playerId_).setup(jwOptions);
 
-  this.player_.onReady(goog.partial(openmultimedia.componentes.video.ReproductorNoticias.onJwplayerReady_, this));
-  this.player_.onPlaylist(goog.partial(openmultimedia.componentes.video.ReproductorNoticias.onJwplayerPlaylist_, this));
+    var playerContainer = this.player_.getContainer();
 
-  goog.base(this, 'enterDocument');
+    this.playerElement_ = playerContainer.parentNode;
+
+    this.player_.onReady(goog.partial(openmultimedia.componentes.video.ReproductorNoticias.onJwplayerReady_, this));
+
+    this.player_.onPlaylist(goog.partial(openmultimedia.componentes.video.ReproductorNoticias.onJwplayerPlaylist_, this));
+
+    goog.base(this, 'enterDocument');
+};
+
+/** @override */
+openmultimedia.componentes.video.ReproductorNoticias.prototype.exitDocument = function() {
+  goog.DEBUG && console.log('EXIT Removing player');
+
+  if ( this.playerReady_ ) {
+    this.player_.stop();
+    //this.player_.remove();
+  } else {
+    //goog.style.showElement( this.playerElement_, false );
+    //this.player_.onReady(function(){ this.remove(); });
+  }
+
+  this.player_ = null;
+  this.playerReady_ = false;
+  this.playerElement_ = null;
+
+  goog.base(this, 'exitDocument');
 };
 
 openmultimedia.componentes.video.ReproductorNoticias.prototype.getJwOptions_ = function() {
@@ -230,21 +262,32 @@ openmultimedia.componentes.video.ReproductorNoticias.prototype.playClip = functi
 };
 
 openmultimedia.componentes.video.ReproductorNoticias.prototype.playClipList = function(clipData, autoplay) {
+  goog.DEBUG && console.log('Playing', clipData);
   this.clearPending_();
 
-  if (this.player_) {
+  if (this.player_ && this.playerReady_) {
     var renderingMode = this.player_.getRenderingMode();
 
     if ( renderingMode ) {
       // Se detiene el video actual y se carga el nuevo
-      this.player_.stop();
+      try {
+        this.player_.stop();
+      } catch (e) {
+        goog.DEBUG && console.warn('No se pudo detener el video: ' + e);
+      }
 
       var videoList = openmultimedia.componentes.video.ReproductorNoticias.makePlaylist( clipData, renderingMode );
 
-      this.player_.load(videoList);
+      goog.DEBUG && console.log('Playing VideoList', videoList);
+
+      try {
+        this.player_.load(videoList);
+      } catch(e) {
+        goog.DEBUG && console.warn('No se pudo cargar los videos: ' + e);
+      }
 
       // Se conoce el Modo de Rendering actual, se guarda la lista de reproducción procesada en caso de que el player este en modo de espera
-    this.setPendingVideoList_(videoList);
+      this.setPendingVideoList_(videoList);
     }
   }
 
@@ -254,9 +297,17 @@ openmultimedia.componentes.video.ReproductorNoticias.prototype.playClipList = fu
   this.setPendingAutoplay_(autoplay);
 };
 
+openmultimedia.componentes.video.ReproductorNoticias.stop = function() {
+  if ( this.player_ ) {
+    this.player_.stop();
+  }
+}
+
 /** @this {jwplayer.Player} */
 openmultimedia.componentes.video.ReproductorNoticias.onJwplayerReady_ = function(multimediaPlayer, event) {
-  goog.DEBUG && console.log('External Ready');
+  goog.DEBUG && console.log('External Ready', event);
+
+  multimediaPlayer.playerReady_ = true;
 
   var pendingVideoList = multimediaPlayer.getPendingVideoList_();
 

@@ -85,13 +85,11 @@ openmultimedia.componentes.mapas.ClipInfoWindow = function (medio, opt_options) 
     goog.style.showElement(this.divPlayer, true);
     this.player_ = new openmultimedia.componentes.video.ReproductorNoticias(this.medio_, this.playerOptions_);
 
-    /*
     if ( this.options_['type'] == WindowTypeEnum.InfoWindow ) {
       google.maps.addEventListener( this.infoWindow_, 'closeclick', goog.bind(this.onInfoWindowClosed_, this) );
     } else {
       goog.events.listen(this.infoWindow_, 'closeclick', goog.bind(this.onInfoWindowClosed_, this) );
     }
-    */
   }
 }
 
@@ -216,8 +214,8 @@ openmultimedia.componentes.mapas.ClipInfoWindow.prototype.open = function ( mark
 
   if ( this.options_['player'] ) {
     if ( ! this.player_.isInDocument() ) {
-      this.player_.render(this.divPlayer);
-    }
+        this.player_.render(this.divPlayer);
+    } 
   }
 }
 
@@ -353,12 +351,10 @@ openmultimedia.componentes.mapas.ClipInfoWindow.prototype.onClickPrev_ = functio
   this.setCurrentIndex( newIndex );
 };
 
-/*
 openmultimedia.componentes.mapas.ClipInfoWindow.prototype.onInfoWindowClosed_ = function () {
   goog.DEBUG  && console.log('IW Closed');
   if ( this.player_ ) {
-    goog.DEBUG && console.log('Disposing Player');
+    goog.DEBUG && console.log('Hiding Player');
     this.player_.exitDocument();
   }
 }
-*/
