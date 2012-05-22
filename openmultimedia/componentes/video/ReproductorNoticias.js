@@ -3,7 +3,6 @@ goog.provide('openmultimedia.componentes.video.ReproductorNoticias');
 goog.require('goog.ui.Component');
 goog.require('openmultimedia.componentes.video.JwPlugin');
 goog.require('openmultimedia.configuration');
-goog.require('openmultimedia.dom.utils');
 goog.require('openmultimedia.externals.jwplayer');
 goog.require('openmultimedia.resources.externals.jwplayer');
 goog.require('openmultimedia.resources.video.jwplugin');
