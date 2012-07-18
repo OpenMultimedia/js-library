@@ -354,7 +354,6 @@ jwplayer.source = document.createElement("source");/**
 	 * Extracts a plugin name from a string
 	 */
 	jwplayer.utils.getPluginName = function(pluginName) {
-              console.log('JWPLAYER','Getting name from', pluginName);
 		if (pluginName.lastIndexOf("/") >= 0) {
 			pluginName = pluginName.substring(pluginName.lastIndexOf("/") + 1,
 					pluginName.length);
@@ -369,9 +368,6 @@ jwplayer.source = document.createElement("source");/**
 		if (pluginName.lastIndexOf(".js") >= 0) {
 			pluginName = pluginName.substring(0, pluginName.lastIndexOf(".js"));
 		}
-
-                console.log('JWPLAYER','Returning name from', pluginName);
-
 		return pluginName;
 	};
 
@@ -3898,8 +3894,6 @@ playerReady = function(obj) {
 			}
 
 			var bgcolor = "#000000";
-
-			console.log('JWPLAYER PARAMS', params);
 
 			var flashPlayer;
 			if (jwplayer.utils.isIE()) {
