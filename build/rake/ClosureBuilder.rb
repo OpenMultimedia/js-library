@@ -53,12 +53,13 @@ module OpenMultimedia
 
       command = [ "python", "#{closure_library_path}/closure/bin/build/depswriter.py" ]
 
-      lib_path = Pathname.new(File.join(closure_library_path, "closure/goog/base.js"))
+      closure_library_goog_base_path = Pathname.new(File.absolute_path(File.join(closure_library_path, "closure/goog/")))
 
-      roots.each do |arg|
-        path = Pathname.new(arg)
+      roots.each do |path|
+        absolute_path = Pathname.new( File.absolute_path(path) )
+        relative_path = absolute_path.relative_path_from(closure_library_goog_base_path)
 
-        command << "--root_with_prefix" << "'#{path.to_s}' '#{path.relative_path_from(lib_path)}'";
+        command << "--root_with_prefix" << "'#{path}' '#{relative_path}'";
       end
 
       command << "--output_file" << output_path
