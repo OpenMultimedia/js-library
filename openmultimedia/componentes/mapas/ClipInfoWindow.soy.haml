@@ -1,0 +1,44 @@
+{namespace openmultimedia.componentes.mapas.ClipInfoWindowTemplates}
+
+:plain
+    /**
+     * Contenedor de la información
+     * @param localization Objeto con las cadenas localizadas
+     */
+{template .container}
+- chain = OpenMultimedia::Soy::Utils::CssClassChain.new haml_buffer
+%div{chain.get("openmultimedia-infowindow")}
+    %div{chain.get("info")}
+        %div{chain.get("item")}
+            %div{chain.get("", "clip")}
+                %img{chain.get("thumbnail")}
+                %h3{ chain.get("title")}
+                %div{chain.get("timeplace")}
+            %div{chain.get("separador")}
+            %div{chain.get("player")}
+            %div{chain.get("separador")}
+            %div{chain.get("corresponsal")}
+                %span{chain.get("label")}
+                    {$localization.etiquetas.corresponsal}
+                %span{chain.get("nombre")}
+                %div{chain.get("twitter")}
+                    %div{ chain.get("avatar")}
+                    %span{chain.get("screenname")}
+                    %span{chain.get("tweet")}
+            %div{chain.get("entrevista")}
+                %div{chain.get("entrevistado")}
+                    %span{chain.get("label")}
+                        {$localization.etiquetas.entrevistado}
+                    %span{chain.get("nombre")}
+                %div{chain.get("entrevistador")}
+                    %span{chain.get("label")}
+                        {$localization.etiquetas.entrevistador}
+                    %span{chain.get("nombre")}
+    %div{chain.get("nav")}
+        %div{chain.get("prev")}
+        %div{chain.get("next")}
+        %div{chain.get("pagination")}
+            %span{chain.get("current")}
+            {sp}/{sp}
+            %span{chain.get("total")}
+{/template}

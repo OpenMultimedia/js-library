@@ -1,0 +1,18 @@
+{namespace openmultimedia.componentes.mapas.ButtonListFilterTemplates}
+
+:plain
+    /**
+     * Contenedor con el marcado principal para el filtro de botones
+     * @param idPrefix Prefijo a aplicar al ID de cada elemento
+     * @param classes Clases a aplicar a este objeto
+     * @param items La lista de objetos que se mostrarán en el filtro
+     * @param localization El arreglo con la información de localización
+     */
+{template .container}
+%div{:class => "{css openmultimedia-componentes-mapa-button-list-filter}"}
+    {foreach $item in $items}
+    %div{:id => "{$idPrefix}-{$item.slug}",
+        :class => "{css openmultimedia-componentes-mapa-buttonlistfilter-item} {$classes.button} {if not isLast($item)}{$classes.buttonCollapseRight}{/if} {if not isFirst($item)}{$classes.buttonCollapseLeft}{/if}"}
+        {$localization[$item.slug].nombre}
+    {/foreach}
+{/template}
