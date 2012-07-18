@@ -369,6 +369,8 @@ openmultimedia.componentes.video.ReproductorNoticias.makePlaylist = function (cl
       video['file'] = currentClip['streaming']['rtmp_file'];
     } else {
       video['file'] = currentClip['archivo_url'];
+      video['provider']  = 'http';
+      video['http.startparam'] = 'start';
     }
 
     videoList[i] = video;
