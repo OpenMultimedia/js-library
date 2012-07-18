@@ -1,0 +1,3 @@
+# Archivos intermedios y finales del proceso de construcción de templates
+*.haml-out.soy
+*.soy-out.js
