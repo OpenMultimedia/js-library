@@ -61,11 +61,11 @@ openmultimedia.componentes.mapas.ClipInfoWindow = function (medio, opt_options) 
 
   this.divEntrevistaInfo = goog.dom.getElementByClass(goog.getCssName('openmultimedia-infowindow-info-item-entrevista'), this.nodo_);
 
-  this.divEntrevistadoInfo = goog.dom.getElementByClass(goog.getCssName('openmultimedia-infowindow-info-item-entrevistado'), this.nodo_);
-  this.spanEntrevistadoNombre = goog.dom.getElementByClass(goog.getCssName('openmultimedia-infowindow-info-item-entrevistado-nombre'), this.nodo_);
+  this.divEntrevistadoInfo = goog.dom.getElementByClass(goog.getCssName('openmultimedia-infowindow-info-item-entrevista-entrevistado'), this.nodo_);
+  this.spanEntrevistadoNombre = goog.dom.getElementByClass(goog.getCssName('openmultimedia-infowindow-info-item-entrevista-entrevistado-nombre'), this.nodo_);
 
-  this.divEntrevistadorInfo = goog.dom.getElementByClass(goog.getCssName('openmultimedia-infowindow-info-item-entrevistador'), this.nodo_);
-  this.spanEntrevistadorNombre = goog.dom.getElementByClass(goog.getCssName('openmultimedia-infowindow-info-item-entrevistador-nombre'), this.nodo_);
+  this.divEntrevistadorInfo = goog.dom.getElementByClass(goog.getCssName('openmultimedia-infowindow-info-item-entrevista-entrevistador'), this.nodo_);
+  this.spanEntrevistadorNombre = goog.dom.getElementByClass(goog.getCssName('openmultimedia-infowindow-info-item-entrevista-entrevistador-nombre'), this.nodo_);
 
   this.divPagination = goog.dom.getElementByClass(goog.getCssName('openmultimedia-infowindow-nav'), this.nodo_);
   this.divPaginationPrev = goog.dom.getElementByClass(goog.getCssName('openmultimedia-infowindow-nav-prev'), this.nodo_);
@@ -215,7 +215,7 @@ openmultimedia.componentes.mapas.ClipInfoWindow.prototype.open = function ( mark
   if ( this.options_['player'] ) {
     if ( ! this.player_.isInDocument() ) {
         this.player_.render(this.divPlayer);
-    } 
+    }
   }
 }
 
