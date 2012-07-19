@@ -6,7 +6,24 @@ module OpenMultimedia
       end
     end
 
+    module Haml
+      def self.params
+        if not defined? @params
+          @params = {}
+          ENV["HAML_PARAMS"].split(",").collect do |value|
+            pieces = value.split("=")
+            @params[pieces[0]] = ((pieces.length > 1) && pieces[1]) || true
+          end
+        end
+        @params
+      end
+    end
+
     module Utils
+      def self.haml_params()
+        @haml_params
+      end
+
       class CssClassChain
         @haml_buffer = nil
         @class_chain = nil
@@ -45,4 +62,3 @@ module OpenMultimedia
     end
   end
 end
-
