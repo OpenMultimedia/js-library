@@ -102,23 +102,52 @@ module OpenMultimedia
       end
 
       print "Ejecutando: #{command.join(" ")}\n"
-      system *command
+      system(*command)
     end
 
     def closure_stylesheets_build(params)
       source = params[:source] || raise(ArgumentError, "source param required")
       target = params[:target] || raise(ArgumentError, "target param required")
-      pretty_print = params[:pretty_print] || false
+      pretty_print = params[:pretty_print]
+      allow_unrecognized_properties = params[:allow_unrecognized_properties]
+      allow_properties = params[:allow_properties]
+      allow_unrecognized_functions = params[:allow_unrecognized_functions]
+      allow_functions = params[:allow_functions]
+      defines = params[:defines]
 
       command = [ "java", "-jar", closure_stylesheets_jar ]
 
       command << "--pretty-print" if pretty_print
 
+      if defines
+        defines.each do |define|
+          command << "--define" << define
+        end
+      end
+
+      command << "--allow-unrecognized-properties" if allow_unrecognized_properties
+
+      command << "--allow-unrecognized-functions" if allow_unrecognized_functions
+
+      if allow_properties
+        allow_properties.each do |property|
+          command << "--allowed-unrecognized-property" << property
+        end
+      end
+
+      if allow_functions
+        allow_functions.each do |function|
+          command << "--allowed-non-standard-function" << function
+        end
+      end
+
       command << source
 
       command << "--output-file" << target
 
-      system *command
+      print "Ejecutando: #{command.join(" ")}"
+
+      system(*command)
     end
 
     def closure_build(params)
@@ -127,7 +156,7 @@ module OpenMultimedia
       inputs = params[:inputs] || nil
       namespaces = params[:namespaces] || nil
 
-      if not (inputs or namespaces)
+      if (not inputs) and (not namespaces)
         raise raise(ArgumentError, "inputs or namespaces parameter required")
       end
 
@@ -225,7 +254,7 @@ module OpenMultimedia
 
       print "Ejecutando: #{ command.join(" ") }\n"
 
-      system *command
+      system(*command)
     end
 
     ## Task Generators
@@ -236,7 +265,7 @@ module OpenMultimedia
       params = args[:params] || {}
 
       file source do |task|
-        if not File.exists? (source)
+        if not File.exists?(source)
           raise "El archivo #{source} ya debe existir"
         end
       end
