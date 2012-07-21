@@ -171,6 +171,7 @@ module OpenMultimedia
       compiler_compilation_level = params[:compiler_compilation_level] || "ADVANCED_OPTIMIZATIONS"
       compiler_process_closure_primitives = params[:compiler_process_closure_primitives] || true
       compiler_output_wrapper = params[:compiler_output_wrapper] || "(function(){%output%})();"
+      compiler_warnings = params[:compiler_warnings]
 
       command = [ "python", "#{closure_library_path}/closure/bin/build/closurebuilder.py" ]
 
@@ -217,7 +218,13 @@ module OpenMultimedia
 
       if externs
         externs.each do |extern_file|
-          command << "--compiler_flags=--externs=#{extern_file}" if extern_file
+          command << "--compiler_flags" << "--externs=#{extern_file}" if extern_file
+        end
+      end
+
+      if compiler_warnings
+        compiler_warnings.each do |warning_code|
+          command << "--compiler_flags" << "--jscomp_warning=#{warning_code}"
         end
       end
 

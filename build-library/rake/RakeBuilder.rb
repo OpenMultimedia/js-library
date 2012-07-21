@@ -10,6 +10,11 @@ module OpenMultimedia
     include SassBuilder
     include ClosureBuilder
 
+    def swap_extension(filename, original, replacement)
+      original = Regexp.new(Regexp.quote(original) + '$') if String === original
+      filename.gsub(original, replacement)
+    end
+
     def import_file(args)
       source = args[:source] || raise(ArgumentError, "origin_file required")
       target = args[:target] || raise(ArgumentError, "origin_file required")
@@ -26,7 +31,7 @@ module OpenMultimedia
       remove(target) if File.exists? target
 
       print "Importando <#{source}> a <#{target}>\n"
-      file = link(source, target)
+      link(source, target)
     end
 
     def compile_stylesheet
