@@ -1,0 +1,31 @@
+.openmultimedia-componentes-videostrip-container {
+    .openmultimedia-componentes-videostrip-title {
+        clear: both;
+    }
+
+    .openmultimedia-componentes-videostrip-content {
+        .openmultimedia-componentes-videostrip-item {
+            display: block;
+            padding: 4px;
+
+            .openmultimedia-componentes-videostrip-item-title {
+                display: block;
+                float: right;
+                clear: right;
+            }
+
+            .openmultimedia-componentes-videostrip-item-thumbnail {
+                display: block;
+                float: left;
+                clear: left;
+                margin-right: 4px;
+            }
+
+            .openmultimedia-componentes-videostrip-item-duration {
+                display: block;
+                float: right;
+                clear: right;
+            }
+        }
+    }
+}

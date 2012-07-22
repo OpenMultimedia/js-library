@@ -8,6 +8,7 @@ goog.require('openmultimedia.api.utils');
 goog.require('openmultimedia.componentes.mapas');
 goog.require('openmultimedia.componentes.mapas.ClipInfoWindowTemplates');
 goog.require('openmultimedia.componentes.mapas.SkinnableInfoWindow');
+goog.require('openmultimedia.componentes.mapas.PositionableInfoWindow');
 goog.require('openmultimedia.componentes.video.ReproductorNoticias');
 goog.require('openmultimedia.externals.twitter.ManejadorApi');
 
@@ -28,6 +29,9 @@ openmultimedia.componentes.mapas.ClipInfoWindow = function (medio, opt_options) 
       this.infoWindow_ = new google.maps.InfoWindow();
 
       break;
+    case WindowTypeEnum.Positionable:
+        this.infoWindow_ = new openmultimedia.componentes.mapas.PositionableInfoWindow();
+        break;
     case WindowTypeEnum.Overlay:
     default:
       this.infoWindow_ = new openmultimedia.componentes.mapas.SkinnableInfoWindow();

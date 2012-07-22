@@ -1,0 +1,98 @@
+goog.provide('openmultimedia.componentes.mapas.PositionableInfoWindow');
+
+goog.require('openmultimedia.componentes.mapas.PositionableInfoWindowTemplates');
+goog.require('goog.dom');
+goog.require('goog.style');
+goog.require('goog.events');
+goog.require('goog.events.EventTarget');
+
+/** @constructor */
+openmultimedia.componentes.mapas.PositionableInfoWindow = function () {
+   this.node_ = soy.renderAsFragment( openmultimedia.componentes.mapas.PositionableInfoWindowTemplates.container );
+   this.windowNode_ = goog.dom.getElementByClass(goog.getCssName('openmultimedia-infowindow-window'), this.node_);
+   this.contentNode_ = goog.dom.getElementByClass(goog.getCssName('openmultimedia-infowindow-window-content'), this.node_);
+   this.closeButtonNode_ = goog.dom.getElementByClass(goog.getCssName('openmultimedia-infowindow-window-close-button'), this.node_);
+
+   goog.events.listen(this.closeButtonNode_, 'click', goog.bind( this.onCloseClick_, this ));
+}
+
+goog.inherits(openmultimedia.componentes.mapas.PositionableInfoWindow, goog.events.EventTarget);
+
+/**
+ * Description
+ * @type {Element}
+ */
+openmultimedia.componentes.mapas.PositionableInfoWindow.prototype.node_ = null;
+
+openmultimedia.componentes.mapas.PositionableInfoWindow.prototype.windowNode_ = null;
+
+openmultimedia.componentes.mapas.PositionableInfoWindow.prototype.contentNode_ = null;
+
+openmultimedia.componentes.mapas.PositionableInfoWindow.prototype.closeButtonNode_ = null;
+
+openmultimedia.componentes.mapas.PositionableInfoWindow.prototype.map_ = null;
+openmultimedia.componentes.mapas.PositionableInfoWindow.prototype.marker_ = null;
+openmultimedia.componentes.mapas.PositionableInfoWindow.prototype.container_ = null;
+openmultimedia.componentes.mapas.PositionableInfoWindow.prototype.content_ = null;
+
+openmultimedia.componentes.mapas.PositionableInfoWindow.prototype.setContent = function (content) {
+   if ( this.content_ != content ) {
+      goog.dom.removeChildren(this.contentNode_); // __windowContentNode.contents().detach();
+      this.content_ = content;
+
+      //TODO (arv): Validar otros tipos de contenido además de Nodos, como cadenas etc
+      goog.dom.append(this.contentNode_, content);
+      // content.show(); ?
+   }
+
+   this.adjustSize_();
+
+   return true;
+}
+
+openmultimedia.componentes.mapas.PositionableInfoWindow.prototype.open = function(map, marker) {
+   this.map_ = map;
+   this.marker_ = marker;
+
+   this.container_ = map.getDiv();
+   goog.dom.append(this.container_, this.node_);
+   goog.style.showElement(this.node_, true);
+   this.adjustSize_();
+
+   return true;
+}
+
+openmultimedia.componentes.mapas.PositionableInfoWindow.prototype.close = function () {
+   if ( this.node_ ) {
+      goog.style.showElement(this.node_, false );
+   }
+
+   return true;
+ }
+
+openmultimedia.componentes.mapas.PositionableInfoWindow.prototype.adjustSize_ = function() {
+   if ( ! this.content_ ) {
+      return;
+   }
+
+   goog.DEBUG && console.log('Ajustando tamaño');
+
+   var tmpContentSize = goog.style.getBorderBoxSize(this.contentNode_);
+   var tmpMargins = goog.style.getMarginBox(this.contentNode_);
+
+   tmpContentSize.width += ( tmpMargins.left + tmpMargins.right);
+   tmpContentSize.height += ( tmpMargins.top + tmpMargins.bottom);
+
+   goog.style.setSize(this.windowNode_, tmpContentSize);
+
+   if ( this.container_ ) {
+      var tmpContainerSize = goog.style.getBorderBoxSize( this.container_ );
+      goog.style.setPosition( this.windowNode_, (tmpContainerSize.width - tmpContentSize.width) / 2, (tmpContainerSize.height - tmpContentSize.height) / 2 );
+   }
+}
+
+openmultimedia.componentes.mapas.PositionableInfoWindow.prototype.onCloseClick_ = function() {
+   goog.DEBUG && console.log('Dispatching CloseClick');
+   this.dispatchEvent(new goog.events.Event('closeclick', this));
+   this.close();
+};

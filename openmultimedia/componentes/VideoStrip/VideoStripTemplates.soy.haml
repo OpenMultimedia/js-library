@@ -1,0 +1,28 @@
+- chain = OpenMultimedia::Soy::Utils::CssClassChain.new haml_buffer
+
+{namespace openmultimedia.componentes.VideoStripTemplates}
+
+:soydoc
+    Contenedor del componente para mostrar una tira de videos
+    @param localization Cadenas localizadas en el lenguaje actual
+{template .container}
+%div{chain.get("openmultimedia-componentes-videostrip", "container")}
+    %div{chain.get("title")}
+        %span {$localization.titulo}
+    %div{chain.get("content")}
+{/template}
+
+:soydoc
+    Contenedor del componente para mostrar una tira de videos
+    @param titulo Titulo del clip
+    @param thumbnail Url de la miniatura
+    @param duracion Duracion del clip
+{template .item}
+%div{chain.get("openmultimedia-componentes-videostrip-item")}
+    %div{chain.get("title")}
+        %span {$titulo}
+    %div{chain.get("thumbnail")}
+        %img(src = "{$thumbnail}")
+    %div{chain.get("duration")}
+        %span {$duracion}
+{/template}

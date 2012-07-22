@@ -1,9 +1,8 @@
 {namespace openmultimedia.componentes.mapas.SkinnableInfoWindowTemplates}
 
-:plain
-    /**
-     * Contenedor de la ventana
-     */
+:soydoc
+    Contenedor de la ventana
+
 - chain = OpenMultimedia::Soy::Utils::CssClassChain.new haml_buffer
 {template .container}
 %div{chain.get("openmultimedia-infowindow","container")}

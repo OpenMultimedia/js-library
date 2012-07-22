@@ -1,10 +1,9 @@
 {namespace openmultimedia.componentes.mapas.ClipInfoWindowTemplates}
 
-:plain
-    /**
-     * Contenedor de la información
-     * @param localization Objeto con las cadenas localizadas
-     */
+:soydoc
+    Contenedor de la información
+    @param localization Objeto con las cadenas localizadas
+
 {template .container}
 - chain = OpenMultimedia::Soy::Utils::CssClassChain.new haml_buffer
 %div{chain.get("openmultimedia-infowindow")}

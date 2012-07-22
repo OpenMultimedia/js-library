@@ -4,6 +4,10 @@ module OpenMultimedia
       def Commands.css(class_name)
         "{css #{class_name}}"
       end
+
+      def Commands.namespace(namespace)
+          "{namespace #{namespace}"
+      end
     end
 
     module Haml

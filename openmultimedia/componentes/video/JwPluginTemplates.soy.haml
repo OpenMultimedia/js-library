@@ -1,0 +1,12 @@
+- soycmd = OpenMultimedia::Soy::Commands
+{namespace openmultimedia.componentes.video.JwPluginTemplates}
+
+:soydoc
+    Muestra el Overlay indicando que la señal en vivo se está reproduciendo
+    @param lang Lenguaje del componente
+    @param localization Arreglo con las cadenas localizadas
+
+{template .LiveOverlay}
+%div{:lang => "{$lang}", :class => soycmd.css("openmultimedia-componentes-player-overlay-live-on")}
+    {$localization.en_vivo}
+{/template}

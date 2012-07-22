@@ -1,0 +1,14 @@
+{namespace openmultimedia.componentes.mapas.PositionableInfoWindowTemplates}
+
+:soydoc
+    Contenedor de la ventana
+
+- chain = OpenMultimedia::Soy::Utils::CssClassChain.new haml_buffer
+{template .container}
+%div{chain.get("openmultimedia-infowindow","container")}
+    %div{chain.get("overlay")}
+    %div{chain.get("window")}
+        %div{chain.get("","content-wrapper")}
+            %div{chain.get("content")}
+            %div{chain.get("close-button")}
+{/template}

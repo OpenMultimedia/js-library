@@ -8,6 +8,7 @@ module OpenMultimedia
       command = [ "haml" ]
 
       command << "--require" << File.join( File.dirname(__FILE__), "..", "haml/SoyUtils" )
+      command << "--require" << File.join( File.dirname(__FILE__), "..", "haml/SoyDocFilter" )
 
       if ( params and not params.empty? )
         ENV["HAML_PARAMS"] = (params.collect do |name, value|
@@ -21,7 +22,7 @@ module OpenMultimedia
 
       print "Ejecutando: #{ command.join(" ")}\n"
 
-      system *command
+      system(*command)
     end
   end
 end
