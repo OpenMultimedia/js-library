@@ -67,11 +67,9 @@ openmultimedia.componentes.VideoStrip.prototype.reload = function() {
         goog.object.extend(apiParams, this.controls_[i].getApiParams());
     }
 
-    console.log("Lol>", apiParams['detalle']);
     if ( apiParams['detalle'] != openmultimedia.api.DetalleClip.COMPLETO) {
         apiParams['detalle'] = openmultimedia.api.DetalleClip.COMPLETO;
     }
-    console.log("Lolcat>", openmultimedia.api.DetalleClip, apiParams['detalle']);
 
     this.manejadorApi_.loadClipList(apiParams, goog.bind(this.onLoadClips_, this));
 }
