@@ -6,8 +6,6 @@ goog.require("goog.ui.Component");
 goog.require("goog.events.EventType");
 
 openmultimedia.componentes.VideoStripItem = function (dataItem, opt_domHelper) {
-    console.log("Cargando datos en Item: ", dataItem);
-
     this.data_ = dataItem;
 
     this.templateData_ = {
@@ -32,7 +30,6 @@ openmultimedia.componentes.VideoStripItem.prototype.createDom = function() {
 }
 
 openmultimedia.componentes.VideoStripItem.prototype.enterDocument = function () {
-    console.log("Entering");
     goog.events.listen(this.element_, goog.events.EventType.CLICK, this.onClick_);
 
     goog.base(this, "enterDocument");
@@ -45,6 +42,5 @@ openmultimedia.componentes.VideoStripItem.prototype.exitDocument = function () {
 }
 
 openmultimedia.componentes.VideoStripItem.prototype.onClick_ = function (event) {
-    console.log("OnItemClick First")
     this.dispatchEvent(new goog.events.Event(goog.events.EventType.CLICK));
 }
