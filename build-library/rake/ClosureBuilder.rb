@@ -239,12 +239,18 @@ module OpenMultimedia
         end
       end
 
-      command << "#{closure_templates_js_path}/soyutils_usegoog.js"
-
       if files
         files.each do |file|
           if file
             command << file
+          end
+        end
+      end
+
+      if namespaces
+        namespaces.each do |namespace|
+          if namespace
+            command << "--namespace" << namespace
           end
         end
       end
