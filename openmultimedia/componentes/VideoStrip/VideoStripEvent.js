@@ -4,7 +4,6 @@ goog.provide("openmultimedia.componentes.VideoStripEventType");
 goog.require("goog.events.Event");
 
 openmultimedia.componentes.VideoStripEvent = function(type, opt_videoStripItem, opt_target) {
-    console.log("Item event for:", opt_videoStripItem);
     this.item = opt_videoStripItem;
     goog.base(this, type, opt_target);
 }

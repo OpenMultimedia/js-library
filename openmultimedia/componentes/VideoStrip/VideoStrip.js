@@ -82,7 +82,5 @@ openmultimedia.componentes.VideoStrip.prototype.onLoadClips_ = function(dataList
 }
 
 openmultimedia.componentes.VideoStrip.prototype.onItemClick_ = function (event) {
-    console.log("OnItemClick Original", this);
     this.dispatchEvent(new openmultimedia.componentes.VideoStripEvent(openmultimedia.componentes.VideoStripEventType.ITEM_CLICK, event.target));
 }
-
