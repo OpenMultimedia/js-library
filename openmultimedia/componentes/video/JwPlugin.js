@@ -256,7 +256,7 @@ openmultimedia.componentes.video.JwPlugin.prototype.loadClip = function(clip, op
 
   if ((this.mode_ === openmultimedia.externals.jwplayer.Mode.FLASH) &&
     ('metodo_preferido' in clip) &&
-    (clip['metodo_preferido'] === openmultimedia.api.MetodoTransmision.Streaming) &&
+    (clip['metodo_preferido'] === openmultimedia.api.MetodoTransmision.STREAMING) &&
     ('streaming' in clip)) {
     video['streamer'] = clip['streaming']['rtmp_server'];
     video['file'] = clip['streaming']['rtmp_file'];

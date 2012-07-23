@@ -22,14 +22,14 @@ openmultimedia.api.HorarioSemana;
  * @enum {string}
  */
 openmultimedia.api.DetalleClip = {
-  Completo: 'completo'
+  COMPLETO: 'completo'
 };
 
 openmultimedia.api.TipoClip = {
-  Entrevista: 'entrevista'
+  ENTREVISTA: 'entrevista'
 };
 
 openmultimedia.api.MetodoTransmision = {
   HTTP: 'http',
-  Streaming: 'streaming'
+  STREAMING: 'streaming'
 };

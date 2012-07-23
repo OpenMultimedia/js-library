@@ -10,6 +10,7 @@ goog.require("openmultimedia.api.ManejadorApi");
 goog.require("goog.events");
 goog.require("goog.events.EventType");
 goog.require("goog.object");
+goog.require("openmultimedia.api");
 
 /**
  * @constructor
@@ -65,6 +66,12 @@ openmultimedia.componentes.VideoStrip.prototype.reload = function() {
     for ( var i = 0; i < this.controls_.length; i += 1 ) {
         goog.object.extend(apiParams, this.controls_[i].getApiParams());
     }
+
+    console.log("Lol>", apiParams['detalle']);
+    if ( apiParams['detalle'] != openmultimedia.api.DetalleClip.COMPLETO) {
+        apiParams['detalle'] = openmultimedia.api.DetalleClip.COMPLETO;
+    }
+    console.log("Lolcat>", openmultimedia.api.DetalleClip, apiParams['detalle']);
 
     this.manejadorApi_.loadClipList(apiParams, goog.bind(this.onLoadClips_, this));
 }

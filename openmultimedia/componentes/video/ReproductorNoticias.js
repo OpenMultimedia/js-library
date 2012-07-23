@@ -364,7 +364,7 @@ openmultimedia.componentes.video.ReproductorNoticias.makePlaylist = function (cl
         'playlist.image': currentClip['thumbnail_pequeno']
     };
 
-    if ( streamingSupport && ( currentClip['metodo_preferido'] == openmultimedia.api.MetodoTransmision.Streaming ) ) {
+    if ( streamingSupport && ( currentClip['metodo_preferido'] == openmultimedia.api.MetodoTransmision.STREAMING ) ) {
       video['streamer'] = currentClip['streaming']['rtmp_server'];
       video['file'] = currentClip['streaming']['rtmp_file'];
     } else {

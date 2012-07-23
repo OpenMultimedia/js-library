@@ -282,7 +282,7 @@ openmultimedia.componentes.mapas.ClipInfoWindow.prototype.fillData_ = function(d
     goog.style.showElement( this.divCorresponsalInfo, false );
   }
 
-  if ( openmultimedia.api.utils.clipEsDeTipo( dataItem, openmultimedia.api.TipoClip.Entrevista ) ) {
+  if ( openmultimedia.api.utils.clipEsDeTipo( dataItem, openmultimedia.api.TipoClip.ENTREVISTA ) ) {
     goog.style.showElement(this.divEntrevistaInfo, true);
 
     if ( dataItem['entrevistado'] ) {
