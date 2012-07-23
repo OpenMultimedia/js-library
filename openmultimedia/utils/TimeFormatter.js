@@ -4,7 +4,9 @@ openmultimedia.utils.TimeFormatter.formatDuration = function (duration) {
     /** @type {Date} */
     var datePieces = duration.match(/^(\d+):(\d+):(\d+)$/);
 
-    var h = parseInt(datePieces[0]), m = parseInt(datePieces[1]), s = parseInt(datePieces[2]);
+    var h = parseInt(datePieces[1], 10);
+    var m = parseInt(datePieces[2], 10);
+    var s = parseInt(datePieces[3], 10);
 
     if ( h > 0 ) {
         return (h > 9 ? "" : "0") + h + ":" + (m > 9 ? "" : "0") + m + " hr";

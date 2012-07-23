@@ -3,6 +3,8 @@ goog.provide("openmultimedia.componentes.VideoStrip")
 goog.require("openmultimedia.componentes.VideoStripTemplates")
 goog.require("openmultimedia.componentes.VideoStripItem")
 goog.require("openmultimedia.componentes.VideoStripOptions")
+goog.require("openmultimedia.componentes.VideoStripEvent");
+goog.require("openmultimedia.componentes.VideoStripEventType");
 goog.require("goog.ui.Component");
 goog.require("openmultimedia.api.ManejadorApi");
 goog.require("goog.events");
@@ -20,6 +22,9 @@ openmultimedia.componentes.VideoStrip = function(medio, opt_options, opt_domHelp
     this.controls_ = this.options_.controls ? this.options_.controls : null;
 
     this.manejadorApi_ = new openmultimedia.api.ManejadorApi(medio, this.options_.lang);
+
+    // Pre-binded event helpers
+    this.onItemClick_ = goog.bind(this.onItemClick_, this);
 
     goog.base(this, opt_domHelper);
 }
@@ -42,6 +47,8 @@ openmultimedia.componentes.VideoStrip.prototype.enterDocument = function () {
     for ( var i = 0; i < this.controls_.length; i += 1 ) {
         goog.events.listen(this.controls_[i], goog.events.EventType.CHANGE, goog.bind(this.onControlChange_, this));
     }
+
+    goog.base(this, "enterDocument");
 
     this.reload();
 }
@@ -70,5 +77,12 @@ openmultimedia.componentes.VideoStrip.prototype.onLoadClips_ = function(dataList
     for ( var i = 0; i < dataList.length; i += 1 ) {
         videoItem = new openmultimedia.componentes.VideoStripItem(dataList[i], this.getDomHelper());
         this.addChild(videoItem, true);
+        goog.events.listen(videoItem, goog.events.EventType.CLICK, this.onItemClick_);
     }
 }
+
+openmultimedia.componentes.VideoStrip.prototype.onItemClick_ = function (event) {
+    console.log("OnItemClick Original", this);
+    this.dispatchEvent(new openmultimedia.componentes.VideoStripEvent(openmultimedia.componentes.VideoStripEventType.ITEM_CLICK, event.target));
+}
+
