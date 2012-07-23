@@ -309,12 +309,29 @@ openmultimedia.componentes.mapas.MapaCorresponsales.prototype.setControls = func
     }
 }
 
-openmultimedia.componentes.mapas.MapaCorresponsales.prototype.toggleInfoWindow_ = function (marker, dataList) {
-  this.clipInfoWindow_.close();
+openmultimedia.componentes.mapas.MapaCorresponsales.prototype.findMarker = function (clipData) {
+    var geotag = clipData["geotag"];
+    if ( geotag in this.markerMap_) {
+        this.openInfoWindow_(this.markerMap_[geotag], [clipData]);
+    }
+}
 
-  if ( this.clipInfoWindow_.getCurrentMarker() != marker ) {
+openmultimedia.componentes.mapas.MapaCorresponsales.prototype.openInfoWindow_ = function(marker, dataList) {
+    this.closeInfoWindow_();
+    
     this.clipInfoWindow_.setDataList( dataList );
     this.clipInfoWindow_.open( marker );
+}
+
+openmultimedia.componentes.mapas.MapaCorresponsales.prototype.closeInfoWindow_ = function() {
+    this.clipInfoWindow_.close();
+}
+
+openmultimedia.componentes.mapas.MapaCorresponsales.prototype.toggleInfoWindow_ = function (marker, dataList) {
+  this.closeInfoWindow_();
+
+  if ( this.clipInfoWindow_.getCurrentMarker() != marker ) {
+    this.openInfoWindow_(marker, dataList);
   }
 }
 
@@ -387,6 +404,7 @@ openmultimedia.componentes.mapas.MapaCorresponsales.prototype.clearInfo = functi
   }
 
   this.markerList_ = [];
+  this.markerMap_ = {};
 }
 
 openmultimedia.componentes.mapas.MapaCorresponsales.prototype.setInfo = function (clipData) {
@@ -430,6 +448,8 @@ openmultimedia.componentes.mapas.MapaCorresponsales.prototype.setInfo = function
     }
 
     var tmpMarker = new google.maps.Marker(markerOptions);
+
+    this.markerMap_[geotag] = tmpMarker;
     this.markerList_.push( tmpMarker );
 
     google.maps.event.addListener(tmpMarker, 'click', goog.partial( this.onMarkerClick_, this, dataList ) );
