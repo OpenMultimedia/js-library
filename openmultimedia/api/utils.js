@@ -32,16 +32,24 @@ openmultimedia.api.utils.LOCALIZATION = {
 openmultimedia.api.utils.formatPlace = function (dataItem) {
   var etiqueta = '';
   var ciudad = dataItem['ciudad'];
+  var estado = dataItem['estado'];
   var pais = dataItem['pais'];
 
-  if ( ciudad || pais ) {
-    if ( pais && pais['nombre'] ) {
-      etiqueta = (ciudad ? ciudad + ', ': '') + pais['nombre'];
-    } else if ( ciudad ) {
-      etiqueta = ciudad;
-    }
+  var pieces = [];
+
+  if ( ciudad ) {
+    pieces.push(ciudad);
   }
-  return etiqueta;
+
+  if ( estado ) {
+    pieces.push(estado['nombre']);
+  }
+
+  if ( pais ) {
+    pieces.push(pais['nombre']);
+  }
+
+  return pieces.join(', ');
 }
 
 openmultimedia.api.utils.formatDateTime = function (dateString, lang) {
