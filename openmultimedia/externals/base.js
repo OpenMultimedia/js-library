@@ -9,7 +9,7 @@ goog.provide('openmultimedia.externals');
  * @return {boolean} Devuelve si fue posible inyectar la dependencia (si se esta
  *     trabajando en un documento HTML)
  */
-openmultimedia.externals.inject = function(src) {
+openmultimedia.externals.injectScriptURL = function(src) {
   if (goog.global.document && goog.global.document.write) {
     var doc = goog.global.document;
     doc.write(
@@ -19,3 +19,17 @@ openmultimedia.externals.inject = function(src) {
     return false;
   }
 };
+
+openmultimedia.externals.injectScriptCode = function(code) {
+  if (goog.global.document && goog.global.document.write) {
+    var doc = goog.global.document;
+    doc.write(
+        '<script type="text/javascript">' + code + '</' + 'script>');
+    return true;
+  } else {
+    return false;
+  }
+};
+
+/** @deprecated Usar injectScriptURL instead*/
+openmultimedia.externals.inject = openmultimedia.externals.injectScriptURL;

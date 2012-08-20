@@ -1,29 +1,39 @@
 goog.provide('openmultimedia.Medio');
 
+goog.require('openmultimedia.DescriptorMedio');
 goog.require('goog.array');
 
 /**
  * Manejador para el medio actual
  * @param {openmultimedia.Medio.DescriptorMedio} descriptorMedio Descriptor que
  *     define las configuraciones generales del medio
- * @param {string} defaultLanguage Lenguaje que usará el Medio por defecto
- *     en caso de que no se indique un lenguaje.
+ * @param {string} language Lenguaje que usará el Medio
  * @constructor
  */
-openmultimedia.Medio = function(descriptorMedio, defaultLanguage) {
-  this.descriptorMedio_ = descriptorMedio;
+openmultimedia.Medio = function(descriptorMedio, language) {
+    this.descriptorMedio_ = descriptorMedio;
 
-  if ( ! defaultLanguage in this.descriptorMedio_ ) {
-    throw Error('El lenguaje por defecto no es válido para el Descriptor de Medio');
-  }
+    if ( ! this.descriptorMedio_.lenguajes ) {
+      throw Error('No se han indicado lenguajes válidos para este Medio')
+    }
 
-  var validLanguages = [];
-  for ( var lang in this.descriptorMedio_ ) {
-    validLanguages.push(lang);
-  };
+    var validLanguages = {};
+    var defaultLanguage;
+    var lenguajes = this.descriptorMedio_.lenguajes;
 
-  this.validLanguages_ = validLanguages;
-  this.defaultLanguage_ = defaultLanguage;
+    for ( var i = 0; i < lenguajes.length; i += 1 ) {
+        if ( i == 0 ) {
+            defaultLanguage = lenguajes[i];
+        }
+
+        validLanguages[lenguajes[i].slug] = lenguajes[i];
+    }
+
+    this.validLanguages_ = validLanguages;
+
+    this.defaultLanguage_ = defaultLanguage.slug;
+
+    this.language_ = ( language && language in validLanguages ) ? language : defaultLanguage.slug;
 }
 
 /**
@@ -42,7 +52,17 @@ openmultimedia.Medio.prototype.defaultLanguage_ = '';
  * Arreglo con los lenguajes válidos para el medio
  * @type {Array.<string>}
  */
-openmultimedia.Medio.prototype.validLanguages_ = [];
+openmultimedia.Medio.prototype.validLanguages_ = {};
+
+openmultimedia.Medio.prototype.getLanguage = function () {
+    var lang = this.validLanguages_[ this.language_ ];
+
+    return { slug: lang.slug, nombre: openmultimedia.Medio.getLocalizedString(lang.nombre) }
+}
+
+openmultimedia.Medio.prototype.getLanguageCode = function () {
+    return this.language_;
+}
 
 /**
  * Valida que el lenguaje dado sea válido. Si lo es, devuelve el lenguaje dado;
@@ -52,7 +72,7 @@ openmultimedia.Medio.prototype.validLanguages_ = [];
  * @deprecated Use isValidLanguage, getDefaultLanguage instead
  */
 openmultimedia.Medio.prototype.getValidLanguage = function (opt_lang) {
-  if ( opt_lang && opt_lang in this.descriptorMedio_ ) {
+  if ( opt_lang && opt_lang in this.validLanguages_ ) {
     return opt_lang;
   }
 
@@ -65,7 +85,7 @@ openmultimedia.Medio.prototype.getValidLanguage = function (opt_lang) {
  * @return {boolean} Si el lenguaje es válido para este medio
  */
 openmultimedia.Medio.prototype.isValidLanguage = function (lang) {
-  return Boolean( lang && lang in this.descriptorMedio_ );
+  return Boolean( lang && lang in this.validLanguages_ );
 }
 
 /**
@@ -79,10 +99,10 @@ openmultimedia.Medio.prototype.getDefaultLanguage = function () {
 /**
  * Devuelve un arreglo con los lenguajes válidos para el medio. Para validar si
  * un lenguaje es válido, usar {@code isValidLanguage}
- * @return {Array.<string>} Un arreglo con los lenguajes válidos para el medio
+ * @return {Object.<string>} Un arreglo con los lenguajes válidos para el medio
  */
 openmultimedia.Medio.prototype.getValidLanguages = function () {
-  return this.validLanguages_;
+  return this.descriptorMedio_.lenguajes;
 }
 
 /**
@@ -90,29 +110,60 @@ openmultimedia.Medio.prototype.getValidLanguages = function () {
  * @param {string} opt_lang Código del lenguaje a utilizar en el API REST.
  *     Si el lenguaje no es válido para este medio, se usará el lenguaje por defecto.
  * @return {string} Url base API REST para este medio en el lenguaje seleccionado
+ * @deprecated
  */
-openmultimedia.Medio.prototype.getApiUrl = function (opt_lang) {
-
-  /**
-   * El lenguaje que se usará en el API. Se usa getValidLanguage para obtener un
-   * lenguaje válido para el medio
-   * @type {string}
-   */
-  var lang;
-
-  if ( opt_lang && this.isValidLanguage(opt_lang) ) {
-    lang = opt_lang;
-  } else {
-    lang = this.getDefaultLanguage();
-  }
-
-  //CHECK (arv): ¿Habria que validar si 'api_url' termina en "/" o confiamos en que si se inyectará bien?
-  return this.descriptorMedio_[lang].api_url;
+openmultimedia.Medio.prototype.getApiUrl = function () {
+    var api = this.getApi('multimedia');
+    return api.url;
 }
 
-/**
- * Descriptor del Medio según se define en:
- * https://gist.github.com/23f079c364b015fa0187
- * @typedef {Object.<string, {nombre: string, slug: string, api_url: string, media_url: string, streaming: Array.<{nombre: string, slug: string, tipo: string, host: string, streams: {adaptive: { stream: string }, 360p: {stream: string }, 160p: {stream:string}}, protocols: { rtmp:{ port: number, manifest: string }, hls: {port: number, playlist: string}, rtsp: {port: number}}}>}>}
- */
-openmultimedia.Medio.DescriptorMedio;
+openmultimedia.Medio.prototype.getApi = function (apiName) {
+    if ( ! this.descriptorMedio_.apis ) {
+        return null;
+    }
+
+    var apis = this.descriptorMedio_.apis;
+
+    if ( ! apiName in apis ) {
+        return null;
+    }
+
+    var api = this.descriptorMedio_.apis[apiName];
+
+    return {
+        titulo: openmultimedia.Medio.getLocalizedString(api.titulo, this.language_, this.defaultLanguage_)
+        ,url: openmultimedia.Medio.getLocalizedString(api.url, this.language_, this.defaultLanguage_)
+    }
+}
+
+openmultimedia.Medio.prototype.getFeedUrl = function (siteName, feedFormat) {
+    if ( ! this.descriptorMedio_.links ) return null
+
+    var links = this.descriptorMedio_.links
+
+    if ( ! siteName in links ) return null
+
+    var site = this.descriptorMedio_.links[siteName]
+
+    if ( ! site ) return null
+
+    if ( ! site.feeds ) return null
+
+    if (! (feedFormat in site.feeds) ) return null
+
+    var feed = site.feeds[feedFormat]
+
+    return openmultimedia.Medio.getLocalizedString(feed, this.language_, this.defaultLanguage_)
+}
+
+openmultimedia.Medio.getLocalizedString = function (localizedString, preferredLang, defaultLang) {
+    if ( typeof localizedString === 'string' ) {
+        return localizedString;
+    } else {
+        if ( preferredLang in localizedString ) {
+            return localizedString[preferredLang]
+        } else {
+            return localizedString[defaultLang]
+        }
+    }
+}

@@ -318,7 +318,7 @@ openmultimedia.componentes.mapas.MapaCorresponsales.prototype.findMarker = funct
 
 openmultimedia.componentes.mapas.MapaCorresponsales.prototype.openInfoWindow_ = function(marker, dataList) {
     this.closeInfoWindow_();
-    
+
     this.clipInfoWindow_.setDataList( dataList );
     this.clipInfoWindow_.open( marker );
 }
@@ -565,10 +565,27 @@ openmultimedia.componentes.mapas.MapaCorresponsales.prototype.enterDocument = fu
         this.panTo( coords );
       }
 
+      this.selectedRegion_ = region;
+
       mapaMultimedia.reload();
     };
 
     google.maps.event.addListener(this.map_, "maptypeid_changed", goog.partial(onMapTypeIdChanged, this));
+
+    var self = this;
+    google.maps.event.addListener(this.map_, "dragend", function() {
+        var region = this.selectedRegion_;
+
+        if ( region.bounds ) {
+            goog.DEBUG && console.log("Adjusting...");
+            var bounds = openmultimedia.externals.google.maps.makeLatLngBounds(region.bounds);
+
+            if ( ! self.map_.getBounds().intersects(bounds) ) {
+                var coords = openmultimedia.externals.google.maps.makeLatLng(region.center);
+                this.panTo( coords );
+            }
+        }
+    });
   }
 
   goog.DEBUG && console.log('Final opts', mapOptions);

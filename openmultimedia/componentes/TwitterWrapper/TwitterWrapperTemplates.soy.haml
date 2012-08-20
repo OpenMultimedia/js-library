@@ -1,0 +1,14 @@
+- chain = OpenMultimedia::Soy::Utils::CssClassChain.new haml_buffer
+
+{namespace openmultimedia.componentes.TwitterWrapperTemplates}
+
+:soydoc
+    Contenedor del componente para mostrar una lista de Feeds
+    @param widget_id Id del Widget de Twitter nativo
+    @param localization Cadenas localizadas en el lenguaje actual
+{template .container}
+%div{chain.get("openmultimedia-componentes-twitterwrapper", "container")}
+    %div{chain.get("title")}
+        %span {$localization.titulo}
+    %div{chain.get("content")}(id="{$widget_id}")
+{/template}

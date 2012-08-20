@@ -25,7 +25,7 @@ openmultimedia.api.ManejadorApi.prototype.lang_ = '';
 if ( goog.DEBUG ) {
   openmultimedia.api.ManejadorApi.prototype.timeout_ = 200000;
 } else {
-  openmultimedia.api.ManejadorApi.prototype.timeout_ = 10000;
+  openmultimedia.api.ManejadorApi.prototype.timeout_ = 1000000;
 }
 
 /**

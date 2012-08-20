@@ -1,0 +1,29 @@
+- chain = OpenMultimedia::Soy::Utils::CssClassChain.new haml_buffer
+
+{namespace openmultimedia.componentes.FeedListTemplates}
+
+:soydoc
+    Contenedor del componente para mostrar una lista de Feeds
+    @param localization Cadenas localizadas en el lenguaje actual
+{template .container}
+%div{chain.get("openmultimedia-componentes-feedlist", "container")}
+    %div{chain.get("title")}
+        %span {$localization.titulo}
+    %ul{chain.get("content")}
+{/template}
+
+:soydoc
+    Item de la lista de feeds
+    @param titulo Titulo del Feed
+    @param contenido Resumen de la noticia
+    @param url URL de la noticia original
+{template .item}
+%li{chain.get("openmultimedia-componentes-feedlist-item")}
+    %div{chain.get("title")}
+        %span
+            %a(href="{$url}") {$titulo}
+    {if $contenido}
+    %div{chain.get("content")}
+        %span {$contenido}
+    {/if}
+{/template}

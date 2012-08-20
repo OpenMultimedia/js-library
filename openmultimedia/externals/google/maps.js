@@ -1,5 +1,7 @@
 goog.provide('openmultimedia.externals.google.maps');
 
+goog.require('openmultimedia.externals');
+
 /** @define {boolean} Define si se usará el sensor para Google Maps o no */
 openmultimedia.externals.google.maps.DEFAULT_USE_SENSOR = false;
 
@@ -10,7 +12,7 @@ openmultimedia.externals.google.maps.requireLib = function (opt_sensor) {
   // Se valida que la biblioteca no haya sido incluida
   if ( ! openmultimedia.externals.google.maps.included_ && (typeof google == 'undefined' || ! google.maps) ) {
     var useSensor = opt_sensor !== undefined ? opt_sensor : openmultimedia.externals.google.maps.DEFAULT_USE_SENSOR;
-    var libUrl = 'http://maps.google.com/maps/api/js?sensor=' + ( useSensor ? 'true' : 'false' );
+    var libUrl = 'https://maps.google.com/maps/api/js?sensor=' + ( useSensor ? 'true' : 'false' );
 
     goog.DEBUG && console.info('Inyectando dependencia de Biblioteca JavaScript de Google Maps: ', libUrl);
     openmultimedia.externals.inject(libUrl);
@@ -30,6 +32,13 @@ openmultimedia.externals.google.maps.makeMarkerImage = function (markerDescripto
 openmultimedia.externals.google.maps.makeLatLng = function(latLngDescriptor) {
   return new google.maps.LatLng(latLngDescriptor.lat, latLngDescriptor.lng);
 };
+
+openmultimedia.externals.google.maps.makeLatLngBounds = function(latLngBoundsDescriptor) {
+    return new google.maps.LatLngBounds(
+        openmultimedia.externals.google.maps.makeLatLng(latLngBoundsDescriptor.sw)
+        ,openmultimedia.externals.google.maps.makeLatLng(latLngBoundsDescriptor.ne)
+    )
+}
 
 openmultimedia.externals.google.maps.makeSize = function(sizeDescriptor) {
   return new google.maps.Size(sizeDescriptor.width, sizeDescriptor.height);
