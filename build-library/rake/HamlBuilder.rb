@@ -20,9 +20,11 @@ module OpenMultimedia
 
       command << source << target
 
-      print "Ejecutando: #{ command.join(" ")}\n"
+      log command.join(" ")
 
-      system(*command)
+        when_writing("LOL") do
+            system(*command) unless nowrite
+        end
     end
   end
 end

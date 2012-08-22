@@ -15,6 +15,28 @@ module OpenMultimedia
       filename.gsub(original, replacement)
     end
 
+    def notice(*args)
+        cadenas = args.collect { |arg| "- " << arg }
+        puts(*cadenas)
+    end
+
+    def log(*args)
+        return if not verbose
+        puts(*args)
+    end
+
+    def load(files)
+        if not files.respond_to? 'each'
+            puts "Loading files: %s" % [ files ] if verbose
+            files = FileList.new files
+        end
+
+        files.each do |file|
+            puts "Loading Rake file: %s" % [ file ] if verbose
+            super file
+        end
+    end
+
     def import_file(args)
       source = args[:source] || raise(ArgumentError, "origin_file required")
       target = args[:target] || raise(ArgumentError, "origin_file required")
@@ -23,18 +45,15 @@ module OpenMultimedia
       target_intermediate = File.join(target_dir, File.basename(source))
 
       if not File.exists? target_dir
-        print "Creando directorio #{target_dir}\n"
+        print "Creando directorio #{target_dir}\n" if verbose
         mkdir_p target_dir
       end
 
       remove(target_intermediate) if File.exists? target_intermediate
       remove(target) if File.exists? target
 
-      print "Importando <#{source}> a <#{target}>\n"
+      print "Importando <#{source}> a <#{target}>\n" if verbose
       link(source, target)
-    end
-
-    def compile_stylesheet
     end
 
     ## Task Gens

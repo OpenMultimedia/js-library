@@ -64,9 +64,9 @@ module OpenMultimedia
 
       command << "--output_file" << output_path
 
-      print "Ejecutando: #{(command.collect { |i| %Q["#{i}"] }).join(" ")}\n"
+      log((command.collect { |i| %Q["#{i}"] }).join(" "))
 
-      system(*command)
+      system(*command) unless nowrite
     end
 
     def closure_templates_build(params)
@@ -101,8 +101,8 @@ module OpenMultimedia
         command << file
       end
 
-      print "Ejecutando: #{command.join(" ")}\n"
-      system(*command)
+      log command.join(" ")
+      system(*command) unless nowrite
     end
 
     def closure_stylesheets_build(params)
@@ -145,9 +145,9 @@ module OpenMultimedia
 
       command << "--output-file" << target
 
-      print "Ejecutando: #{command.join(" ")}"
+      log command.join(" ")
 
-      system(*command)
+      system(*command) unless nowrite
     end
 
     def closure_build(params)
@@ -265,9 +265,9 @@ module OpenMultimedia
 
       command << "--output_file" << output_file
 
-      print "Ejecutando: #{ command.join(" ") }\n"
+      log command.join(" ")
 
-      system(*command)
+      system(*command) unless nowrite
     end
 
     ## Task Generators

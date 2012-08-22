@@ -6,9 +6,9 @@ module OpenMultimedia
   module SassBuilder
     def sass_test_env()
       if not defined? @sass_installed
-        print "Probando instalación de SASS: \n"
+        info "Probando instalación de SASS: "
         if not @sass_installed = system("sass", "-v")
-          print "SASS no está instalado\n"
+          info "SASS no está instalado"
         end
       end
 
@@ -59,9 +59,9 @@ module OpenMultimedia
 
       command << source << target
 
-      print "Ejecutando: #{(command.collect { |e| "\"#{e}\"" }).join(" ")}\n"
+      log((command.collect { |e| "\"#{e}\"" }).join(" "))
 
-      system(*command)
+      system(*command) unless nowrite
 
     end
   end
