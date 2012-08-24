@@ -6,9 +6,9 @@ module OpenMultimedia
   module SassBuilder
     def sass_test_env()
       if not defined? @sass_installed
-        info "Probando instalación de SASS: "
+        notice "Probando instalación de SASS: "
         if not @sass_installed = system("sass", "-v")
-          info "SASS no está instalado"
+          notice "SASS no está instalado"
         end
       end
 

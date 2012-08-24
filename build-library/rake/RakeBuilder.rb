@@ -16,44 +16,25 @@ module OpenMultimedia
     end
 
     def notice(*args)
-        cadenas = args.collect { |arg| "- " << arg }
-        puts(*cadenas)
+      cadenas = args.collect { |arg| "- " << arg }
+      puts(*cadenas)
     end
 
     def log(*args)
-        return if not verbose
-        puts(*args)
+      return if not verbose
+      puts(*args)
     end
 
     def load(files)
-        if not files.respond_to? 'each'
-            puts "Loading files: %s" % [ files ] if verbose
-            files = FileList.new files
-        end
-
-        files.each do |file|
-            puts "Loading Rake file: %s" % [ file ] if verbose
-            super file
-        end
-    end
-
-    def import_file(args)
-      source = args[:source] || raise(ArgumentError, "origin_file required")
-      target = args[:target] || raise(ArgumentError, "origin_file required")
-
-      target_dir = File.dirname(target)
-      target_intermediate = File.join(target_dir, File.basename(source))
-
-      if not File.exists? target_dir
-        print "Creando directorio #{target_dir}\n" if verbose
-        mkdir_p target_dir
+      if not files.respond_to? 'each'
+        log "load %s" % [ files ]
+        files = FileList.new files
       end
 
-      remove(target_intermediate) if File.exists? target_intermediate
-      remove(target) if File.exists? target
-
-      print "Importando <#{source}> a <#{target}>\n" if verbose
-      link(source, target)
+      files.each do |file|
+        log "load %s" % [ file ]
+        super file
+      end
     end
 
     ## Task Gens
@@ -69,14 +50,19 @@ module OpenMultimedia
 
         full_target = File.join(import_path, target)
 
-        desc "Importa el archivo <#{source}> a #{full_target}"
-        file full_target => source do |task|
-          import_file(source: source, target: full_target)
+        target_dir = File.dirname full_target
+
+        directory target_dir
+
+        ## desc "Importa el archivo <#{source}> a #{full_target}"
+        file full_target => [source, target_dir] do |task|
+          link(source, full_target)
         end
 
         if clean_mode == :clean
           CLEAN.include full_target
         elsif clean_mode == :clobber
+        CLEAN.include full_target
           CLOBBER.include full_target
         end
 
