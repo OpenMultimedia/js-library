@@ -25,9 +25,34 @@ module OpenMultimedia
       puts(*args)
     end
 
+    def load_namespace(path, path_namespace = nil)
+        block = Proc.new do
+            file = File.join(path, "*.rb")
+            load file
+        end
+
+        if ! path_namespace.nil?
+            notice "Loading namespace: %s" % [path_namespace]
+            namespace path_namespace, &block
+        else
+            notice "Loading root namespace"
+            block.call
+        end
+
+        Dir.entries(path).each do |f|
+            next if f.start_with? "."
+            p = File.join(path, f)
+            if File.directory? p
+                new_namespace = path_namespace ? "%s.%s" % [path_namespace, f] : f
+                load_namespace p, new_namespace
+            end
+        end
+
+    end
+
     def load(files)
       if not files.respond_to? 'each'
-        log "load %s" % [ files ]
+        notice "Loading: %s" % [ files ]
         files = FileList.new files
       end
 
@@ -62,7 +87,6 @@ module OpenMultimedia
         if clean_mode == :clean
           CLEAN.include full_target
         elsif clean_mode == :clobber
-        CLEAN.include full_target
           CLOBBER.include full_target
         end
 
