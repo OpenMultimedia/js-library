@@ -47,7 +47,6 @@ module OpenMultimedia
                 load_namespace p, new_namespace
             end
         end
-
     end
 
     def load(files)
@@ -60,6 +59,13 @@ module OpenMultimedia
         log "load %s" % [ file ]
         super file
       end
+    end
+
+    def system(*command)
+        log((command.collect { |i| %Q["#{i}"] }).join(" "))
+        success = super(*command)
+        raise Exception.new("Error al ejecutar el comando externo") if not success
+        success
     end
 
     ## Task Gens

@@ -59,10 +59,9 @@ module OpenMultimedia
 
       command << source << target
 
-      log((command.collect { |e| "\"#{e}\"" }).join(" "))
-
-      system(*command) unless nowrite
-
+      when_writing "Running SASS" do
+        system(*command)
+      end
     end
   end
 end

@@ -4,7 +4,7 @@ require "fileutils"
 module OpenMultimedia
   module ClosureBuilder
     def closure_library_path
-      @closure_library_path ||= "closure-library"
+      @closure_library_path ||= "./closure-library"
     end
 
     def closure_library_path=(value)
@@ -12,7 +12,7 @@ module OpenMultimedia
     end
 
     def closure_compiler_jar
-      @closure_compiler_jar ||= "compiler/compiler.jar"
+      @closure_compiler_jar ||= "./compiler/compiler.jar"
     end
 
     def closure_compiler_jar=(value)
@@ -20,7 +20,7 @@ module OpenMultimedia
     end
 
     def closure_stylesheets_jar
-      @closure_stylesheets_jar ||= "closure-stylesheets/closure-stylesheets.jar"
+      @closure_stylesheets_jar ||= "./closure-stylesheets/closure-stylesheets.jar"
     end
 
     def closure_stylesheets_jar=(value)
@@ -28,7 +28,7 @@ module OpenMultimedia
     end
 
     def closure_templates_jar
-      @closure_templates_jar ||= "closure-templates-for-javascript/SoyToJsSrcCompiler.jar"
+      @closure_templates_jar ||= "./closure-templates-for-javascript/SoyToJsSrcCompiler.jar"
     end
 
     def closure_templates_jar=(value)
@@ -36,7 +36,7 @@ module OpenMultimedia
     end
 
     def closure_templates_js_path
-      @closure_templates_js_path ||= "closure-templates-for-javascript"
+      @closure_templates_js_path ||= "./closure-templates-for-javascript"
     end
 
     def closure_templates_js_path=(value)
@@ -46,10 +46,13 @@ module OpenMultimedia
     def closure_build_dependencies(params)
       roots =  params[:roots] || raise(ArgumentError, "roots parameter required")
       output_path =  params[:output_path] || raise(ArgumentError, "output_path parameter required")
+      using_soy_templates = params[:using_soy_templates] || false
 
       if not roots.kind_of? Enumerable then
         roots = [ roots.to_s ]
       end
+
+      roots = roots + [ closure_templates_js_path ] if using_soy_templates
 
       command = [ "python", "#{closure_library_path}/closure/bin/build/depswriter.py" ]
 
@@ -64,9 +67,9 @@ module OpenMultimedia
 
       command << "--output_file" << output_path
 
-      log((command.collect { |i| %Q["#{i}"] }).join(" "))
-
-      system(*command) unless nowrite
+      when_writing "Running Depswriter" do
+        system(*command)
+      end
     end
 
     def closure_templates_build(params)
@@ -101,8 +104,9 @@ module OpenMultimedia
         command << file
       end
 
-      log command.join(" ")
-      system(*command) unless nowrite
+      when_writing "Running Closure Templates" do
+        system(*command)
+      end
     end
 
     def closure_stylesheets_build(params)
@@ -145,9 +149,9 @@ module OpenMultimedia
 
       command << "--output-file" << target
 
-      log command.join(" ")
-
-      system(*command) unless nowrite
+      when_writing "Running Closure Stylesheets" do
+        system(*command)
+      end
     end
 
     def closure_build(params)
@@ -172,6 +176,8 @@ module OpenMultimedia
       compiler_process_closure_primitives = params[:compiler_process_closure_primitives] || true
       compiler_output_wrapper = params[:compiler_output_wrapper] || "(function(){%output%})();"
       compiler_warnings = params[:compiler_warnings]
+
+      using_soy_templates = params[:using_soy_templates]
 
       command = [ "python", "#{closure_library_path}/closure/bin/build/closurebuilder.py" ]
 
@@ -230,6 +236,7 @@ module OpenMultimedia
 
       command << "--root" << "#{closure_library_path}/closure"
       command << "--root" << "#{closure_library_path}/third_party/closure"
+      command << "--root" << closure_templates_js_path if using_soy_templates
 
       if roots
         roots.each do |root_path|
@@ -265,9 +272,9 @@ module OpenMultimedia
 
       command << "--output_file" << output_file
 
-      log command.join(" ")
-
-      system(*command) unless nowrite
+      when_writing "Running Closure Builder" do
+        system(*command)
+      end
     end
 
     ## Task Generators

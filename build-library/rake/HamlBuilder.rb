@@ -20,11 +20,9 @@ module OpenMultimedia
 
       command << source << target
 
-      log command.join(" ")
-
-        when_writing("LOL") do
-            system(*command) unless nowrite
-        end
+      when_writing "Running HAML" do
+        system(*command)
+      end
     end
   end
 end
